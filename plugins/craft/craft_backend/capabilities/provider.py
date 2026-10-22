@@ -510,6 +510,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "max_output_bytes": 32 * 1024 * 1024,
             "max_parallel_per_consumer": 1,
         })
+    if spec.id=='craft.process_screenshot.attach' and spec.version==2:
+        updates.update({'concurrency_policy':'expected_version','expected_version_payload_path':'expected_revision',
+            'domain_errors_complete':False})
     if spec.id.startswith("craft.resource_requirement."):
         action = spec.id.removeprefix("craft.resource_requirement.")
         effects = {
@@ -667,6 +670,10 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 "This capability projects one existing governed entity card; link identity, version scoping and field allowlisting are enforced by its repository and closed output contract."
             ),
         })
+    if spec.id=='craft.process_screenshot.attach' and spec.version==2:
+        updates.update({'business_effect':'Atomically associate a bounded batch of finalized screenshot artifacts with their exact operations at one pinned BOP revision, preserving prior pictures.',
+            'business_acceptance_criteria':('All artifacts are verified before any BOP mutation.','Every operation belongs to the same requested BOP revision.','Retry returns the same associations; a changed artifact is rejected.','A failed member rolls back the entire Craft transaction.'),
+            'no_business_invariant_reason':'The provider verifies exact immutable ArtifactRefs and the repository locks the version and commits all associations together.'})
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

@@ -18,6 +18,18 @@ _SOLVER_POLICY = json.loads((Path(__file__).resolve().parents[2] / "solver_allow
 _ALLOWED_SOLVERS = frozenset((str(item["solver"]), str(item["version"])) for item in _SOLVER_POLICY["solvers"])
 
 
+def _read_output(reference: str, data: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    scope = {"user_gid": context.user_gid, "team_gid": context.team_gid}
+    digest, _ = _canonical({"scope": scope, "reference": reference, "data": data})
+    metadata = dict(scope)
+    if "items" in data:
+        metadata["returned_count"] = len(data["items"])
+    return CapabilityOutput(data=data, evidence=(EvidenceRef(
+        kind="simulation.read_result", reference=reference, digest=digest,
+        summary="Result of the completed scoped Simulation repository operation", metadata=metadata,
+    ),))
+
+
 def _canonical(value: Any) -> tuple[str, str]:
     encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return "sha256:" + hashlib.sha256(encoded).hexdigest(), encoded.decode("utf-8")
@@ -267,13 +279,13 @@ def get_parameter_set(payload: dict[str, Any], context: CapabilityContext) -> Ca
     ref = ParameterSetRef.model_validate(payload["parameter_set_ref"]).model_dump(mode="json")
     row = repository.get_parameter_set(ref, context)
     if not row: raise CapabilityBusinessError("parameter_set_not_found", "Simulation parameter set not found")
-    return CapabilityOutput(data=_parameter(row))
+    return _read_output(f"simulation://parameter-set/{row['parameter_set_id']}/v{row['version']}", _parameter(row), context)
 
 
 def search_parameter_sets(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     query = str(payload.get("query") or "").strip()
     rows = repository.search_parameter_sets(query, max(1, min(int(payload.get("limit") or 50), 200)), context)
-    return CapabilityOutput(data={"items": [_parameter(row) for row in rows], "total": len(rows), "query": query})
+    return _read_output("simulation://parameter-sets/search", {"items": [_parameter(row) for row in rows], "total": len(rows), "query": query}, context)
 
 
 def create_profile(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
@@ -293,13 +305,13 @@ def get_profile(payload: dict[str, Any], context: CapabilityContext) -> Capabili
     ref = SimulationProfileRef.model_validate(payload["simulation_profile_ref"]).model_dump(mode="json")
     row = repository.get_profile(ref, context)
     if not row: raise CapabilityBusinessError("simulation_profile_not_found", "Simulation profile not found")
-    return CapabilityOutput(data=_profile(row))
+    return _read_output(f"simulation://profile/{row['profile_id']}/v{row['version']}", _profile(row), context)
 
 
 def search_profiles(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     query = str(payload.get("query") or "").strip()
     rows = repository.search_profiles(query, max(1, min(int(payload.get("limit") or 50), 200)), context)
-    return CapabilityOutput(data={"items": [_profile(row) for row in rows], "total": len(rows), "query": query})
+    return _read_output("simulation://profiles/search", {"items": [_profile(row) for row in rows], "total": len(rows), "query": query}, context)
 
 
 def create_environment(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
@@ -324,20 +336,20 @@ def create_environment(payload: dict[str, Any], context: CapabilityContext) -> C
 def get_environment(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     row = repository.get_environment(str(payload["environment_id"]), context)
     if not row: raise CapabilityBusinessError("simulation_environment_not_found", "Simulation environment not found")
-    return CapabilityOutput(data={key: row[key] for key in ("environment_id", "name", "status", "source")})
+    return _read_output(f"simulation://environment/{row['environment_id']}", {key: row[key] for key in ("environment_id", "name", "status", "source")}, context)
 
 
 def list_environments(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     rows = repository.list_environments(max(1, min(int(payload.get("limit") or 50), 200)), context)
     items = [{key: row[key] for key in ("environment_id", "name", "status", "source")} for row in rows]
-    return CapabilityOutput(data={"items": items, "total": len(items)})
+    return _read_output("simulation://environments/search", {"items": items, "total": len(items)}, context)
 
 
 def archive_environment(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     row = repository.archive_environment(str(payload["environment_id"]), context)
     if not row:
         raise CapabilityBusinessError("simulation_environment_not_found", "Simulation environment not found or already archived")
-    return CapabilityOutput(data={key: row[key] for key in ("environment_id", "name", "status", "source")})
+    return _read_output(f"simulation://environment/{row['environment_id']}", {key: row[key] for key in ("environment_id", "name", "status", "source")}, context)
 
 
 def _run(row: Mapping[str, Any]) -> dict[str, Any]:
@@ -360,12 +372,12 @@ def start_run(payload: dict[str, Any], context: CapabilityContext) -> Capability
 def get_run(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     row = repository.get_run(str(payload["run_id"]), context)
     if not row: raise CapabilityBusinessError("simulation_run_not_found", "Simulation run not found")
-    return CapabilityOutput(data=_run(row))
+    return _read_output(f"simulation://run/{row['run_id']}", _run(row), context)
 
 
 def search_runs(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     rows = repository.search_runs(str(payload.get("environment_id") or ""), max(1, min(int(payload.get("limit") or 50), 200)), context)
-    return CapabilityOutput(data={"items": [_run(row) for row in rows], "total": len(rows)})
+    return _read_output("simulation://runs/search", {"items": [_run(row) for row in rows], "total": len(rows)}, context)
 
 
 def _result(row: Mapping[str, Any]) -> dict[str, Any]:

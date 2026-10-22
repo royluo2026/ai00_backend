@@ -114,6 +114,11 @@ class GovernedSimulationRuntimeClient:
         }
 
     async def resolve_resource_models(self, items, context):
+        # Product-only scenes have no tools, fixtures or equipment to resolve.
+        # This is the canonical empty mapping, not a fallback after denial.
+        if not items:
+            return {"resolved": [], "unresolved": [], "ambiguous": [],
+                    "mapping_snapshot_hash": canonical_hash([])}
         return await self._invoke(DomainInvocation(
             "knowledge.resource_model_mapping.resolve", 1, {"items": list(items)},
         ), context)
@@ -137,6 +142,12 @@ class GovernedSimulationRuntimeClient:
             approval_reference=approval_reference,
         ), context)
 
+    async def attach_screenshots(self, *, context, approval_reference, **payload):
+        return await self._invoke(DomainInvocation(
+            'craft.process_screenshot.attach',2,payload,idempotency_key=f"{payload['capture_run_id']}:attach-batch",
+            approval_reference=approval_reference,expected_resource_version=str(payload['expected_revision']),
+        ),context)
+
     @staticmethod
     def connector_outcome_target(plan):
         operations = {step.operation_id for step in plan.steps}
@@ -150,7 +161,8 @@ class GovernedSimulationRuntimeClient:
             capture_steps = [
                 step for step in plan.steps if step.operation_id == "vismockup.view.capture@1"
             ]
-            capture_run_id = str(capture_steps[0].payload.get("capture_run_id") or "") if len(capture_steps) == 1 else ""
+            run_ids = {str(step.payload.get('capture_run_id') or '') for step in capture_steps}
+            capture_run_id = next(iter(run_ids)) if len(run_ids)==1 else ''
             capability_id = "simulation.connector_capture_outcome.apply"
             resource_payload = {"capture_run_id": capture_run_id}
         else:
@@ -222,6 +234,8 @@ class CraftExecutionPlanPortProxy:
 
 
 class CraftScreenshotPortProxy:
+    async def attach_screenshots(self, **kwargs):
+        return await simulation_runtime_ports.require('governed.domain_client').attach_screenshots(**kwargs)
     async def attach_screenshot(self, **kwargs):
         return await simulation_runtime_ports.require("governed.domain_client").attach_screenshot(**kwargs)
 

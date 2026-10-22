@@ -7,6 +7,7 @@ from plugins.ontology.ontology_backend.proposals import (
     OntologyProposalRepository,
     ProposalConflict,
     ProposalIntegrityError,
+    ProposalReviewLimitExceeded,
     normalize_changes,
 )
 from plugins.ontology.ontology_backend.repository import OntologyReleaseRepository
@@ -124,7 +125,7 @@ REVIEWABLE_PROPOSAL_SCHEMA = {
     **PROPOSAL_SCHEMA,
     "properties": {
         **PROPOSAL_SCHEMA["properties"],
-        "reviews": {"type": "array", "items": {
+        "reviews": {"type": "array", "maxItems": 1000, "items": {
             **REVIEW_SCHEMA,
             "properties": {
                 **REVIEW_SCHEMA["properties"],
@@ -204,7 +205,10 @@ def get_proposal(payload: dict[str, Any], _context: CapabilityContext) -> Capabi
 def get_reviewable_proposal(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     output = get_proposal(payload, context)
     data = dict(output.data)
-    reviews = OntologyProposalRepository().list_reviews(data["proposal_gid"], data["proposal_revision_gid"])
+    try:
+        reviews = OntologyProposalRepository().list_reviews(data["proposal_gid"], data["proposal_revision_gid"])
+    except ProposalReviewLimitExceeded as exc:
+        raise CapabilityBusinessError('proposal_review_limit_exceeded', str(exc)) from exc
     data["reviews"] = [_serialize_record(item) for item in reviews]
     data["publishable"] = data["status"] == "review" and is_publishable(
         reviews=reviews, author_gid=str(data["author_gid"]), content_sha256=data["content_sha256"],

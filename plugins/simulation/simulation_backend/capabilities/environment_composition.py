@@ -106,7 +106,13 @@ class EnvironmentCompositionProvider:
         result = compose_manifest(execution, document, mappings, payload["capture_profile"])
         problems = [item.model_dump(mode="json") for item in result.problems]
         if result.manifest is None:
-            return CapabilityOutput(data={"status": "unresolved", "problems": problems})
+            report = {"status": "unresolved", "problems": problems}
+            return CapabilityOutput(data=report, evidence=(EvidenceRef(
+                kind="simulation.environment.binding_report",
+                reference=f"simulation://binding-report/{reference['version_gid']}/{snapshot_request_id}",
+                digest=canonical_hash({"execution_plan_ref": reference,
+                                       "snapshot_hash": document["snapshot_hash"], **report}),
+            ),))
         self.repository.insert_manifest(result.manifest, context, name=str(payload["name"]).strip())
         data = result.manifest.model_dump(mode="json")
         return CapabilityOutput(
@@ -226,7 +232,13 @@ class EnvironmentCompositionProvider:
                 if advertised.get(operation.operation_id) != operation.contract_hash:
                     add("adapter_contract_mismatch", f"{operation.operation_id}:{operation.contract_hash}", advertised.get(operation.operation_id))
         problems.sort(key=lambda item: (str(item["code"]), str(item["expected"]), str(item["actual"])))
-        return CapabilityOutput(data={"compatible": not problems, "problems": problems})
+        report = {"compatible": not problems, "problems": problems}
+        return CapabilityOutput(data=report, evidence=(EvidenceRef(
+            kind="simulation.environment.preflight",
+            reference=f"simulation://environment/{manifest.environment_id}/v{manifest.environment_version}/preflight/{payload['device_id']}",
+            digest=canonical_hash({"manifest_hash": manifest.manifest_hash,
+                                   "device_id": payload["device_id"], "health": health, **report}),
+        ),))
 
 
 default_provider = EnvironmentCompositionProvider(

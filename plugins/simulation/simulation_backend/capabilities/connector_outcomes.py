@@ -60,7 +60,8 @@ class ConnectorOutcomeProvider:
         capture_steps = [
             step for step in plan.steps if step.operation_id == "vismockup.view.capture@1"
         ]
-        actual_id = str(capture_steps[0].payload.get("capture_run_id") or "") if len(capture_steps) == 1 else ""
+        run_ids={str(step.payload.get('capture_run_id') or '') for step in capture_steps}
+        actual_id=next(iter(run_ids)) if len(run_ids)==1 else ''
         if actual_id != payload["capture_run_id"]:
             raise CapabilityBusinessError("plan_outcome_invalid", "plan_outcome_invalid")
         try:

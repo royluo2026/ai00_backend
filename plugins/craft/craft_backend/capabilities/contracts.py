@@ -1124,6 +1124,15 @@ OUTPUT_SCHEMAS[("craft.process_screenshot.attach", 1)] = _object({
     "artifact_ref": _ARTIFACT_REF,
 }, required=("screenshot_gid", "bop_version_gid", "operation_id", "capture_run_id", "artifact_ref"))
 
+INPUT_SCHEMAS[("craft.process_screenshot.attach", 2)] = _object({
+    "bop_version_gid":STRING,"capture_run_id":STRING,
+    "expected_revision":{"type":"integer","minimum":1},
+    "items":{"type":"array","minItems":1,"maxItems":2000,"items":_object({"operation_id":STRING,"artifact_ref":_ARTIFACT_REF},required=("operation_id","artifact_ref"))},
+},required=("bop_version_gid","capture_run_id","expected_revision","items"))
+OUTPUT_SCHEMAS[("craft.process_screenshot.attach", 2)] = _object({
+    "items":{"type":"array","minItems":1,"maxItems":2000,"items":OUTPUT_SCHEMAS[("craft.process_screenshot.attach",1)]}
+},required=("items",))
+
 
 # Desktop major 2 adds model-defined fields; major 1 schemas stay immutable.
 import json as _json

@@ -86,7 +86,14 @@ class ProposalConflict(RuntimeError):
     pass
 
 
+MAX_PROPOSAL_REVIEWS = 1000
+
+
 class ProposalIntegrityError(RuntimeError):
+    pass
+
+
+class ProposalReviewLimitExceeded(ProposalIntegrityError):
     pass
 
 
@@ -233,10 +240,13 @@ class OntologyProposalRepository:
                 cursor.execute(
                     "SELECT gid AS review_gid,proposal_gid,proposal_revision_gid,content_sha256,decision,reviewer_gid,comment,created_at "
                     "FROM workmanship_base_ontology_proposal_reviews "
-                    "WHERE proposal_gid=%s AND proposal_revision_gid=%s ORDER BY created_at",
-                    (proposal_gid, proposal_revision_gid),
+                    "WHERE proposal_gid=%s AND proposal_revision_gid=%s ORDER BY created_at,gid LIMIT %s",
+                    (proposal_gid, proposal_revision_gid, MAX_PROPOSAL_REVIEWS + 1),
                 )
-                return [dict(row) for row in cursor.fetchall()]
+                rows = cursor.fetchall()
+                if len(rows) > MAX_PROPOSAL_REVIEWS:
+                    raise ProposalReviewLimitExceeded('review collection exceeds the bounded proposal contract')
+                return [dict(row) for row in rows]
     def save_review(
         self, *, review_gid: str, proposal_gid: str, proposal_revision_gid: str,
         content_sha256: str, decision: str, reviewer_gid: str, comment: str | None,

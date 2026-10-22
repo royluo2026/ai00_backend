@@ -87,7 +87,10 @@ def descriptor_for(spec):
         "operation_policy": "required" if spec.id == "ontology.release.activate" else ("optional" if write else "none"),
         "idempotency_policy": "required" if write else "none", "consistency_policy": "external" if write else "strong",
         "evidence_policy": "required" if write else "optional", "audit_policy": "high_risk" if spec.id == "ontology.release.activate" else "standard",
-        "domain_errors": ERRORS, "domain_errors_complete": True,
+        "domain_errors": ERRORS + ((DomainErrorContract(
+            code='proposal_review_limit_exceeded',
+            meaning='The complete proposal review history exceeds the bounded read contract; no review decisions were omitted.',
+        ),) if spec.id == 'ontology.change.proposal.get' and spec.version == 2 else ()), "domain_errors_complete": True,
     })
 
 

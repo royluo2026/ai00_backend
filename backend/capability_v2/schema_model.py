@@ -13,16 +13,20 @@ class ColumnSpec:
     default: str | None = None
     extra: str = ""
     sources: tuple[str, ...] = ()
+    generation_expression: str | None = None
 
     def structural_key(self) -> tuple[object, ...]:
-        return (self.name, self.data_type, self.nullable, self.default, self.extra)
+        return (self.name, self.data_type, self.nullable, self.default, self.extra, self.generation_expression)
 
     def to_dict(self) -> dict[str, object]:
-        return {
+        result = {
             "name": self.name, "data_type": self.data_type,
             "nullable": self.nullable, "default": self.default,
             "extra": self.extra, "sources": list(self.sources),
         }
+        if self.generation_expression is not None:
+            result["generation_expression"] = self.generation_expression
+        return result
 
 
 @dataclass(frozen=True)
@@ -124,7 +128,7 @@ def expected_schema_from_dict(document: dict[str, object]) -> ExpectedSchema:
     for raw_table in document["tables"]:
         columns = tuple(ColumnSpec(
             item["name"], item["data_type"], item["nullable"], item.get("default"),
-            item.get("extra", ""), tuple(item.get("sources", ())),
+            item.get("extra", ""), tuple(item.get("sources", ())), item.get("generation_expression"),
         ) for item in raw_table.get("columns", ()))
         indexes = tuple(IndexSpec(
             item["name"], tuple(item["columns"]), item.get("unique", False),

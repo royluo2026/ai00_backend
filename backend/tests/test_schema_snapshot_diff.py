@@ -137,3 +137,48 @@ def test_enum_literal_case_is_a_schema_contract_difference():
     diff = diff_schema(expected, actual)
 
     assert [item.kind for item in diff.manual] == ["type_mismatch", "default_mismatch"]
+
+
+def _generated_diff(expected_expression, actual_expression, *, actual_default=None, missing=False):
+    expected = ExpectedSchema((TableSpec("workmanship_device_assets", "device", "device", False,
+        columns=(ColumnSpec("active_slot", "TINYINT", True, extra="STORED GENERATED", generation_expression=expected_expression),)),))
+    actual = SchemaSnapshot("ai00_test", (SnapshotTable("workmanship_device_assets", "InnoDB", "utf8mb4_general_ci", "BASE TABLE",
+        columns=() if missing else (SnapshotColumn("active_slot", 1, actual_default, True, "TINYINT", "TINYINT(4)", "", "STORED GENERATED", None, None, actual_expression),), indexes=()),))
+    return diff_schema(expected, actual)
+
+
+def test_generated_expression_equivalent_oceanbase_rendering_and_default():
+    live = "case when ((`deleted_at` is NULL) and (`space_kind` = 'team')) then 1 else NULL end"
+    diff = _generated_diff("CASE WHEN deleted_at IS NULL AND space_kind='team' THEN 1 ELSE NULL END", live, actual_default=live)
+    assert diff.safe == ()
+    assert diff.manual == ()
+
+
+@pytest.mark.parametrize("actual", [
+    "CASE WHEN deleted_at IS NULL AND space_kind='personal' THEN 1 ELSE NULL END",
+    "CASE WHEN deleted_at IS NULL OR space_kind='team' THEN 1 ELSE NULL END",
+    "CASE WHEN deleted_at IS NULL AND space_kind='team' THEN 2 ELSE NULL END",
+    "",
+])
+def test_generated_expression_changes_remain_manual(actual):
+    diff = _generated_diff("CASE WHEN deleted_at IS NULL AND space_kind='team' THEN 1 ELSE NULL END", actual)
+    assert [item.kind for item in diff.manual] == ["generated_expression_mismatch"]
+
+
+def test_generated_column_with_unrelated_default_is_not_ignored():
+    diff = _generated_diff("NULLIF(gid,'null')", "NULLIF(`gid`,'null')", actual_default="unrelated")
+    assert [item.kind for item in diff.manual] == ["default_mismatch"]
+
+
+def test_missing_generated_column_requires_manual_migration():
+    diff = _generated_diff("NULLIF(gid,'null')", "", missing=True)
+    assert diff.safe == ()
+    assert [item.kind for item in diff.manual] == ["missing_generated_column"]
+
+
+def test_generated_comparison_precedence_cannot_hide_expression_drift():
+    import sqlite3
+    with sqlite3.connect(":memory:") as connection:
+        assert connection.execute("SELECT a = b IS NULL, a = (b IS NULL) FROM (SELECT 0 AS a, NULL AS b)").fetchone() == (1, 0)
+    diff = _generated_diff("a = b IS NULL", "a = (b IS NULL)")
+    assert [item.kind for item in diff.manual] == ["generated_expression_mismatch"]

@@ -83,6 +83,8 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
     private readonly SemaphoreSlim serial=new(1,1);
     private readonly ViewerExecutionGate executionGate=viewerGate??new();
     private DateTimeOffset Now=>(clock??(()=>DateTimeOffset.UtcNow))();
+    internal static TimeSpan RemainingExecutionBudget(int stepSeconds,DateTimeOffset leaseUntil,DateTimeOffset sessionUntil,DateTimeOffset now)=>
+        new[]{TimeSpan.FromSeconds(stepSeconds),leaseUntil-now-TimeSpan.FromSeconds(30),sessionUntil-now-TimeSpan.FromSeconds(30)}.Min();
     public bool ExecutionQuarantined {get;private set;}
     public bool RequiresProcessRestart {get;private set;}
     private ExecutionPlanV2 Verify(string json)
@@ -133,8 +135,15 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 ct.ThrowIfCancellationRequested();
                 if(Now>=lease.LeaseUntil||Now>=session.ExpiresAt)throw new InvalidDataException("lease_expired");
                 var started=Now;
+                var executionBudget=RemainingExecutionBudget(step.TimeoutSeconds,lease.LeaseUntil,session.ExpiresAt,started);
+                if(executionBudget<=TimeSpan.Zero)
+                {
+                    results.Add(StepResult(step.StepId,started,"failed_without_effect",null,"execution_delivery_budget_exhausted"));
+                    journal.Append("step_terminal",plan.PlanId,results[^1].GetRawText());
+                    break;
+                }
                 using var timeout=CancellationTokenSource.CreateLinkedTokenSource(ct);
-                timeout.CancelAfter(new[]{TimeSpan.FromSeconds(step.TimeoutSeconds),lease.LeaseUntil-Now,session.ExpiresAt-Now}.Min());
+                timeout.CancelAfter(executionBudget);
                 JsonElement payload;
                 try{payload=artifactMaterializer is null?step.Payload:await artifactMaterializer.MaterializeAsync(plan.PlanId,lease.LeaseId,step,session,timeout.Token);}
                 catch(Exception exception)
@@ -190,21 +199,33 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 catch(Exception exception)
                 {
                     _ = exception;
+                    ConnectorNoEffectException? cleanupProof=null;
+                    if(exception is OperationCanceledException&&timeout.IsCancellationRequested&&
+                        step.OperationId=="vismockup.model.open@3"&&invocation is not null)
+                    {
+                        // A deadline can win the await before pre-native materialization
+                        // finishes cleanup. Only its explicit terminal proof clears unknown.
+                        try{await invocation.WaitAsync(TimeSpan.FromSeconds(5));}
+                        catch(ConnectorNoEffectException proof)when(proof.Code is "cancelled" or "cache_open_interrupted")
+                        {cleanupProof=proof;}
+                        catch{}
+                    }
+                    var failure=(Exception?)cleanupProof??exception;
                     if(step.OperationId=="teamcenter.model_file.fetch@1")
                         ModelFileTiming.Write("tc_read_failed",plan.PlanId,step.StepId,adapterTimer.Elapsed.TotalMilliseconds,0,
                             exception is ConnectorException connectorFailure?connectorFailure.Code:"read_invocation_failed");
 #if DEBUG
                     Console.Error.WriteLine($"[ConnectorHost] adapter operation failed: {exception.GetType().Name}: {exception.Message}");
 #endif
-                    var noEffect=exception is ConnectorNoEffectException ||
+                    var noEffect=(failure is ConnectorNoEffectException proven&&proven.Code!="teamcenter_worker_cleanup_failed") ||
                         (!artifactTransferStarted&&step.OperationId!="vismockup.view.capture@1"&&step.SideEffectClassification=="read");
                     status=noEffect?"failed_without_effect":"outcome_unknown";
-                    error=exception is ConnectorNoEffectException rejected
+                    error=failure is ConnectorNoEffectException rejected
                         ? rejected.Code
-                        : exception is ConnectorException connectorError
+                        : failure is ConnectorException connectorError
                         ? connectorError.Code
                         : noEffect?"read_invocation_failed":"invocation_outcome_unknown";
-                    if(exception is OperationCanceledException&&timeout.IsCancellationRequested&&!ct.IsCancellationRequested)
+                    if(cleanupProof is null&&exception is OperationCanceledException&&timeout.IsCancellationRequested&&!ct.IsCancellationRequested)
                     {
                         // Teamcenter structure and property reads share the same
                         // cancellable subprocess worker. Both can prove cleanup;

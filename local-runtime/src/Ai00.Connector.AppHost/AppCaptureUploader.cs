@@ -69,6 +69,7 @@ public sealed class AppCaptureUploader(RuntimeTransport transport,string capture
                 throw new ConnectorNoEffectException("artifact_integrity_failed");
         }
         await using var content=info.OpenRead();
+        var uploadClock=Stopwatch.StartNew();
         var artifact=await transport.UploadCaptureAsync(planId,leaseId,stepId,content,
             capture.Sha256,capture.ByteSize,session,ct);
         if(artifact.ValueKind!=JsonValueKind.Object||
@@ -77,6 +78,10 @@ public sealed class AppCaptureUploader(RuntimeTransport transport,string capture
             artifact.GetProperty("byte_size").GetInt64()!=capture.ByteSize||
             string.IsNullOrWhiteSpace(artifact.GetProperty("artifact_id").GetString()))
             throw new ConnectorException("artifact_upload_receipt_invalid");
+        Console.Error.WriteLine("AI00_CAPTURE_TIMING_V1:"+JsonSerializer.Serialize(new{
+            stage="upload_confirmed",plan_id=planId,step_id=stepId,
+            elapsed_ms=Math.Round(uploadClock.Elapsed.TotalMilliseconds,1),byte_size=capture.ByteSize,
+        }));
         return artifact;
     }
 }

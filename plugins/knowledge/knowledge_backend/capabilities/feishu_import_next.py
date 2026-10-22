@@ -13,7 +13,7 @@ from plugins.knowledge.knowledge_backend.provider import register_capability
 from plugins.knowledge.knowledge_backend.revision_store import (
     canonical_markdown, load_markdown_revision, prepare_markdown_revision, store_markdown_revision,
 )
-from plugins.knowledge.knowledge_backend.source_merge import merge_markdown
+from plugins.knowledge.knowledge_backend.source_merge import MAX_MERGE_CONFLICTS, merge_markdown
 from plugins.knowledge.knowledge_backend.storage import get_immutable
 from plugins.knowledge.knowledge_backend.contracts import document_ref, revision_ref, space_ref
 from .knowledge_documents_next import _require_document_editor, _require_superadmin, _tenant, _trusted_profile
@@ -252,7 +252,7 @@ def register_feishu_import_capabilities(registry) -> None:
         "properties": {"source_gid": {"type": "string"}, "source_snapshot_gid": {"type": "string"},
             "document_gid": {"type": ["string", "null"]}, "current_revision_gid": {"type": ["string", "null"]},
             "base_snapshot_gid": {"type": ["string", "null"]}, "base": {"type": "string"}, "incoming": {"type": "string"},
-            "local": {"type": "string"}, "merged": {"type": ["string", "null"]}, "conflicts": {"type": "array", "items": {"type": "object"}},
+            "local": {"type": "string"}, "merged": {"type": ["string", "null"]}, "conflicts": {"type": "array", "maxItems": MAX_MERGE_CONFLICTS, "items": {"type": "object"}},
             "source_diff": {"type": "string"}, "local_diff": {"type": "string"}, "source_changed": {"type": "boolean"}, "complete": {"type": "boolean"}}}
     receipt_output = {"type": "object", "additionalProperties": False,
         "required": ["source_gid", "source_snapshot_gid", "document_gid", "document_ref", "revision_gid", "revision_ref", "revision_no", "changed"],

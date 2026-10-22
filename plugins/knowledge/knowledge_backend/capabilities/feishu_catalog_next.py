@@ -14,6 +14,9 @@ from plugins.knowledge.knowledge_backend.ids import new_knowledge_id
 from plugins.knowledge.knowledge_backend.provider import register_capability
 from .knowledge_documents_next import _require_superadmin, _tenant, _trusted_profile
 
+MAX_CATALOG_RECORDS = 10000
+MAX_CATALOG_PAGE = 500
+
 
 def _read_sheet_or_explain(read):
     try:
@@ -81,7 +84,13 @@ def sync_catalog(_payload: dict, context: CapabilityContext) -> dict:
     # Finish every remote page before opening a write transaction. Partial reads never retire rows.
     source_kind, _, _ = parse_catalog_url(str(config["source_url"]))
     if source_kind == "bitable":
-        remote = fetch_all_records(lambda token: feishu_service.list_bitable_records(app_token, table_id, token))
+        try:
+            remote = fetch_all_records(lambda token: feishu_service.list_bitable_records(app_token, table_id, token),
+                                       max_records=MAX_CATALOG_RECORDS)
+        except ValueError as exc:
+            if str(exc) != "Bitable record limit exceeded":
+                raise
+            raise CapabilityBusinessError("knowledge_catalog_limit_exceeded", "Source catalog record limit exceeded") from exc
     else:
         access_token = user_credential(context)
         spreadsheet_token = app_token
@@ -97,7 +106,9 @@ def sync_catalog(_payload: dict, context: CapabilityContext) -> dict:
         sheet_id = str(selected.get("sheet_id") or "")
         properties = selected.get("grid_properties") or {}
         row_count = int(properties.get("row_count") or properties.get("rowCount") or 0)
-        if not sheet_id or row_count < 1 or row_count > 10000:
+        if row_count > MAX_CATALOG_RECORDS:
+            raise CapabilityBusinessError("knowledge_catalog_limit_exceeded", "Source catalog row limit exceeded")
+        if not sheet_id or row_count < 1:
             raise ValueError("无法确定“总表”的完整行数，已取消同步")
         values = []
         for start in range(1, row_count + 1, 500):
@@ -110,6 +121,8 @@ def sync_catalog(_payload: dict, context: CapabilityContext) -> dict:
             values.extend(part)
             values.extend([[] for _ in range(end - start + 1 - len(part))])
         remote = sheet_catalog_records(values)
+    if len(remote) > MAX_CATALOG_RECORDS:
+        raise CapabilityBusinessError("knowledge_catalog_limit_exceeded", "Source catalog record limit exceeded")
     parsed = [catalog_row(record) for record in remote]
     with get_knowledge_conn() as conn:
         with conn.cursor() as cur:
@@ -167,7 +180,7 @@ def sync_catalog(_payload: dict, context: CapabilityContext) -> dict:
 def list_catalog(payload: dict, context: CapabilityContext) -> dict:
     tenant = _tenant(context)
     _trusted_profile(context, tenant)
-    limit = max(1, min(int(payload.get("limit") or 100), 500))
+    limit = max(1, min(int(payload.get("limit") or 100), MAX_CATALOG_PAGE))
     if payload.get('include_metadata'):
         limit = min(limit, 20)
     offset = max(0, int(payload.get("offset") or 0))
@@ -208,7 +221,7 @@ def register_feishu_catalog_capabilities(registry) -> None:
                      "properties": {"configured": {"type": "boolean"}, "url": {"type": ["string", "null"]}, "updated_at": {"type": ["string", "null"]}}}
     sync_output = {"type": "object", "additionalProperties": False, "required": ["added", "updated", "inactive", "errors", "checked_at"],
                    "properties": {"added": {"type": "integer"}, "updated": {"type": "integer"}, "inactive": {"type": "integer"},
-                                  "errors": {"type": "array", "items": {"type": "object", "required": ["record_id", "code"], "properties": {"record_id": {"type": "string"}, "code": {"type": "string"}}}},
+                                  "errors": {"type": "array", "maxItems": MAX_CATALOG_RECORDS, "items": {"type": "object", "required": ["record_id", "code"], "properties": {"record_id": {"type": "string"}, "code": {"type": "string"}}}},
                                   "checked_at": {"type": "string"}}}
     item = {"type": "object", "additionalProperties": False,
             "required": ["gid", "record_id", "title", "document_url", "source_gid", "linked_document_gid", "error_code", "active", "updated_at"],
@@ -219,7 +232,7 @@ def register_feishu_catalog_capabilities(registry) -> None:
     item['properties'].update({key: {"type": ["string", "null"]} for key in
                                ('document_author_name', 'document_modified_at', 'feishu_author_name', 'feishu_author_open_id', 'feishu_modified_at', 'feishu_metadata_status')})
     list_output = {"type": "object", "additionalProperties": False, "required": ["items", "total", "limit", "offset"],
-                   "properties": {"items": {"type": "array", "items": item}, "total": {"type": "integer"},
+                   "properties": {"items": {"type": "array", "maxItems": MAX_CATALOG_PAGE, "items": item}, "total": {"type": "integer"},
                                   "limit": {"type": "integer"}, "offset": {"type": "integer"}}}
     register_capability(registry, CapabilitySpec(
         **common, id="knowledge.source.catalog.config.get", description="Read the configured authoritative Feishu catalog link.",

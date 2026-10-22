@@ -14,7 +14,7 @@ from backend.contracts.connector_execution_plan_v1 import (
     ConnectorPlanOutcomeV1,
 )
 
-from .connector_plans import build_capture_plan, build_materialization_plan
+from .connector_plans import build_capture_plan, build_capture_batch_plan, build_materialization_plan
 from .connector_workflow_v2 import matches_prepared_plan
 from ..domain.environment_manifest import REQUIRED_CONNECTOR_OPERATIONS
 
@@ -118,7 +118,7 @@ class CaptureWorkflow:
 
     async def start_capture(
         self, environment_id: str, environment_version: int, device_id: str,
-        context: CapabilityContext,
+        context: CapabilityContext, *, continuous: bool = False,
     ) -> dict[str, Any]:
         tenant_id, user_id = self._identity(context)
         version_gid, definition_hash = self._provenance(context)
@@ -141,6 +141,14 @@ class CaptureWorkflow:
             user_id=user_id, issued_at=self.clock(), operations=(item.operation_id,),
             capability_version_gid=version_gid, business_definition_hash=definition_hash,
         ) for index, item in enumerate(ordered, start=1))
+        if continuous and any(item.product_node_keys for item in ordered):
+            batch = build_capture_batch_plan(
+                manifest, plan_id=capture_run_id, capture_run_id=capture_run_id,
+                device_id=device_id, tenant_id=tenant_id, user_id=user_id, issued_at=self.clock(),
+                operations=tuple(item.operation_id for item in ordered if item.product_node_keys),
+                capability_version_gid=version_gid, business_definition_hash=definition_hash,
+            )
+            plans = tuple(batch if item.product_node_keys else plan for item, plan in zip(ordered, plans, strict=True))
         row = {
             "capture_run_id": capture_run_id, "environment_id": environment_id,
             "environment_version": environment_version, "manifest_hash": manifest.manifest_hash,
@@ -172,6 +180,14 @@ class CaptureWorkflow:
         )
         if manifest is None or manifest.manifest_hash != run["manifest_hash"]:
             raise SimulationWorkflowError("environment_source_changed")
+        completed=[step for step in run['steps'] if step['status']=='completed' and not step.get('artifact_attached')]
+        if completed and len([s for s in parse_plan(completed[0]['plan']).steps if s.operation_id=='vismockup.view.capture@1'])>1:
+            if any(step['status']=='running' for step in run['steps']):return None
+            if any(not step.get('artifact_ref') for step in completed):raise SimulationWorkflowError('artifact_upload_unconfirmed')
+            return {'capability_id':'craft.process_screenshot.attach','major_version':2,
+                'payload':{'bop_version_gid':manifest.execution_source.bop_version_gid,'expected_revision':manifest.execution_source.revision,
+                    'capture_run_id':capture_run_id,'items':[{'operation_id':s['operation_id'],'artifact_ref':s['artifact_ref']} for s in completed]},
+                'idempotency_key':f'{capture_run_id}:attach-batch'}
         for step in run["steps"]:
             if step["status"] == "completed" and not step.get("artifact_attached"):
                 artifact_ref = step.get("artifact_ref")
@@ -214,15 +230,24 @@ class CaptureWorkflow:
                 plan, context, approval_reference=approval_reference,
                 major_version=action["major_version"],
             )
-            operation_id = next(
+            operation_ids = [
                 str(step.payload["operation_id"]) for step in plan.steps
                 if step.operation_id == "vismockup.view.capture@1"
-            )
-            self.repository.update_capture_step(
-                capture_run_id, operation_id, status="running",
-            )
+            ]
+            for operation_id in operation_ids:
+                self.repository.update_capture_step(capture_run_id, operation_id, status="running")
             self.repository.update_capture_run(capture_run_id, status="running")
         else:
+            if action['major_version']==2:
+                receipt=await self.craft_port.attach_screenshots(**payload,context=context,approval_reference=approval_reference)
+                actual=receipt.get('items',[]) if isinstance(receipt,Mapping) else []
+                expected={item['operation_id']:item['artifact_ref'] for item in payload['items']}
+                if len(actual)!=len(expected) or {item.get('operation_id') for item in actual}!=set(expected) or any(
+                    item.get('bop_version_gid')!=payload['bop_version_gid'] or item.get('capture_run_id')!=capture_run_id or item.get('artifact_ref')!=expected.get(item.get('operation_id')) for item in actual):
+                    raise SimulationWorkflowError('artifact_attachment_unconfirmed')
+                for operation_id in expected:self.repository.update_capture_step(capture_run_id,operation_id,artifact_attached=True)
+                self.repository.update_capture_run(capture_run_id,status='completed')
+                return self.repository.get_capture_run(capture_run_id,context)
             await self.craft_port.attach_screenshot(
                 **payload, context=context, approval_reference=approval_reference,
             )
@@ -238,7 +263,7 @@ class CaptureWorkflow:
         return self.repository.get_capture_run(capture_run_id, context)
 
     def get(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any]:
-        run = self.repository.get_capture_run(capture_run_id, context)
+        run = self.repository.get_capture_run(capture_run_id, context, include_plans=False)
         if run is None:
             raise SimulationWorkflowError("capture_run_not_found")
         return run
@@ -300,6 +325,8 @@ class CaptureWorkflow:
         if outcome.plan_id != plan.plan_id or outcome.protocol != plan.protocol:
             raise SimulationWorkflowError("plan_outcome_invalid")
         capture_steps = [step for step in plan.steps if step.operation_id == "vismockup.view.capture@1"]
+        if len(capture_steps) > 1:
+            return self._apply_batch_outcome(plan, outcome, context)
         if len(capture_steps) != 1:
             raise SimulationWorkflowError("plan_outcome_invalid")
         capture_run_id = str(capture_steps[0].payload.get("capture_run_id") or "")
@@ -380,6 +407,49 @@ class CaptureWorkflow:
         elif was_cancelling and "running" not in statuses:
             self.repository.update_capture_run(capture_run_id, status="cancelled")
         return self.repository.get_capture_run(capture_run_id, context)
+
+    def _apply_batch_outcome(self, plan, outcome, context):
+        captures = [step for step in plan.steps if step.operation_id == 'vismockup.view.capture@1']
+        run_ids = {str(step.payload.get('capture_run_id') or '') for step in captures}
+        if len(run_ids) != 1 or not next(iter(run_ids)):
+            raise SimulationWorkflowError('plan_outcome_invalid')
+        run_id = next(iter(run_ids)); run = self.repository.get_capture_run(run_id, context)
+        if run is None:
+            raise SimulationWorkflowError('capture_run_not_found')
+        current = {step['operation_id']:step for step in run['steps']}
+        results = {item.step_id:item for item in outcome.steps}
+        if len(results)!=len(outcome.steps) or set(results)-{step.step_id for step in plan.steps}:
+            raise SimulationWorkflowError('plan_outcome_invalid')
+        updates=[]
+        for capture in captures:
+            operation_id=str(capture.payload.get('operation_id') or '')
+            existing=current.get(operation_id)
+            if existing is None or not matches_prepared_plan(parse_plan(existing.get('plan')),plan):
+                raise SimulationWorkflowError('plan_outcome_invalid')
+            group=[s for s in plan.steps if str(s.payload.get('operation_id') or '')==operation_id]
+            complete=all(s.step_id in results and projection_status(results[s.step_id])=='completed' for s in group)
+            if complete:
+                value=results[capture.step_id].result
+                try:
+                    artifact=ArtifactRef.model_validate(value.get('artifact') if isinstance(value,Mapping) else None)
+                    if artifact.media_type!='image/png':raise ValueError()
+                except (ValueError,TypeError) as exc:
+                    raise SimulationWorkflowError('artifact_upload_unconfirmed') from exc
+                changes={'status':'completed','artifact_ref':artifact.model_dump(mode='json')}
+            else:
+                started=any(s.step_id in results for s in group)
+                uncertain=projection_status(outcome)=='outcome_unknown'
+                changes={'status':'outcome_unknown' if uncertain else 'failed' if started else 'cancelled'}
+            if not existing.get('artifact_attached'):updates.append((operation_id,changes))
+        # Validate every identity and receipt before projecting any batch member.
+        for operation_id,changes in updates:self.repository.update_capture_step(run_id,operation_id,**changes)
+        refreshed=self.repository.get_capture_run(run_id,context)
+        statuses={s['status'] for s in refreshed['steps']}
+        status='outcome_unknown' if 'outcome_unknown' in statuses else 'partial' if statuses&{'failed','cancelled'} and 'completed' in statuses else 'failed' if statuses&{'failed','cancelled'} else 'running'
+        if all(s['status']=='skipped' or s['status']=='completed' and s.get('artifact_attached') for s in refreshed['steps']):status='completed'
+        if run['status'] in {'cancelling','cancelled'}:status='cancelled'
+        self.repository.update_capture_run(run_id,status=status)
+        return self.repository.get_capture_run(run_id,context)
 
     async def retry_step(
         self, capture_run_id: str, operation_id: str, context: CapabilityContext,

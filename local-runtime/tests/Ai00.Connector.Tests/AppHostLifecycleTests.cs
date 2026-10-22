@@ -50,7 +50,7 @@ public sealed class AppHostLifecycleTests
 
     [Fact] public void RuntimeRequestsTheLargestServerSupportedPlanLease()
     {
-        Assert.Equal(300, RuntimeSessionWorker.PlanLeaseSeconds);
+        Assert.Equal(600, RuntimeSessionWorker.PlanLeaseSeconds);
     }
 
     [Theory]
@@ -159,7 +159,12 @@ public sealed class AppHostLifecycleTests
         }
         finally{Directory.Delete(root,true);}
     }
-    [Fact] public async Task FailedWithoutEffectRecoveryConflictDoesNotBlockLaterPlans()
+    [Theory]
+    [InlineData("outcome_acknowledgement_conflict")]
+    [InlineData("plan_lease_invalid")]
+    [InlineData("plan_reconciliation_invalid")]
+    [InlineData("closed_plan")]
+    public async Task FailedWithoutEffectRecoveryConflictPreservesPendingOutcome(string code)
     {
         var root=Path.Combine(Path.GetTempPath(),"ai00-read-recovery-test-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
         try
@@ -172,13 +177,20 @@ public sealed class AppHostLifecycleTests
             var adapter=new OutcomeUnknownRecoveryTests.FakeAdapter(()=>Task.FromResult(new Ai00.Connector.Contracts.AdapterResult(false)));
             var worker=new PlanExecutionWorker(journal,adapter,key,"device-key-001",new Dictionary<string,TrustedPlanKey>{{"cloud-plan-key-2026-09",new(ProtocolV2VectorTests.Vector["plan_public_jwk"]!.ToJsonString(),DateTimeOffset.Parse("2026-09-06T00:00:00Z"),DateTimeOffset.Parse("2026-09-08T00:00:00Z"),false)}},()=>DateTimeOffset.Parse("2026-09-07T01:03:00Z"));
             var outcome=await worker.ExecuteAsync(OutcomeUnknownRecoveryTests.Lease() with{PlanJson=plan.ToJsonString()},OutcomeUnknownRecoveryTests.Session(),CancellationToken.None);
-            using var http=new HttpClient(new InspectRequest(_=>new HttpResponseMessage(System.Net.HttpStatusCode.Conflict){Content=new StringContent("{\"detail\":{\"code\":\"outcome_acknowledgement_conflict\"}}")}));
+            using var http=new HttpClient(new InspectRequest(_=>new HttpResponseMessage(System.Net.HttpStatusCode.Conflict){Content=new StringContent("{\"detail\":{\"code\":\""+code+"\"}}")}));
+            var delivery=new OutcomeDelivery(new RuntimeTransport(http,new Uri("https://gateway.example.com")),journal,()=>DateTimeOffset.Parse("2026-09-08T01:03:00Z"));
+            if(code=="closed_plan"){
+                await delivery.DeliverAsync(outcome,OutcomeUnknownRecoveryTests.Session(),_=>throw new RuntimeTransportException("plan_reconciliation_invalid"),default);
+                Assert.Empty(worker.Recover());Assert.Contains(journal.Events,e=>e.Kind=="acknowledged"&&e.PlanId==outcome.PlanId);
+                Assert.DoesNotContain(journal.Events,e=>e.Kind=="abandoned_without_effect");return;
+            }
 
-            await new OutcomeDelivery(new RuntimeTransport(http,new Uri("https://gateway.example.com")),journal,()=>DateTimeOffset.Parse("2026-09-08T01:03:00Z")).DeliverAsync(
-                outcome,OutcomeUnknownRecoveryTests.Session(),_=>Task.FromResult(OutcomeUnknownRecoveryTests.Session() with{InstanceId="recovery",Token="recovery",ExpiresAt=DateTimeOffset.Parse("2026-09-09T01:03:00Z")}),CancellationToken.None);
+            var error=await Assert.ThrowsAsync<RuntimeTransportException>(()=>delivery.DeliverAsync(
+                outcome,OutcomeUnknownRecoveryTests.Session(),_=>Task.FromResult(OutcomeUnknownRecoveryTests.Session() with{InstanceId="recovery",Token="recovery",ExpiresAt=DateTimeOffset.Parse("2026-09-09T01:03:00Z")}),CancellationToken.None));
 
-            Assert.Contains(journal.Events,e=>e.Kind=="abandoned_without_effect");
-            Assert.Empty(worker.Recover());
+            Assert.Equal(code=="plan_reconciliation_invalid"?code:"outcome_recovery_required",error.Message);
+            Assert.DoesNotContain(journal.Events,e=>e.Kind is "abandoned_without_effect" or "acknowledged");
+            Assert.Equal(outcome.ToJson(),Assert.Single(worker.Recover()).ToJson());
         }
         finally{Directory.Delete(root,true);}
     }
@@ -239,6 +251,21 @@ public sealed class AppHostLifecycleTests
         Assert.EndsWith(Path.Combine("AI00","App","Connector"),Program.StateRoot(false));
         Assert.EndsWith(Path.Combine("AI00","App","Connector-Test"),Program.StateRoot(true));
         Assert.NotEqual(Program.StateRoot(false),Program.StateRoot(true));
+        var isolated=Path.Combine(Path.GetTempPath(),"migration-owned","connector");
+        Assert.Equal(Path.GetFullPath(isolated),Program.StateRoot(true,isolated));
+    }
+    [Fact] public void ExplicitStateRootIsClosedAndDevelopmentRootStaysInItsDeployment()
+    {
+        var production=AppHostOptions.Parse(Args.Concat(new[]{"--state-root",@"C:\AI00\profile\connector"}).ToArray());
+        Assert.Equal(@"C:\AI00\profile\connector",production.StateDirectory);
+        Assert.ThrowsAny<Exception>(()=>AppHostOptions.Parse(Args.Concat(new[]{"--state-root",@"C:\"}).ToArray()));
+        Assert.ThrowsAny<Exception>(()=>AppHostOptions.Parse(Args.Concat(new[]{"--state-root",@"\\server\share"}).ToArray()));
+#if DEBUG
+        var local=Args;local[^1]="http://127.0.0.1:8080";
+        var isolated=AppHostOptions.Parse(local.Concat(new[]{"--state-root",@"C:\AI00\profile\connector","--development","local"}).ToArray());
+        Assert.True(isolated.Development);
+        Assert.ThrowsAny<Exception>(()=>AppHostOptions.Parse(local.Concat(new[]{"--state-root",@"C:\shared\connector","--development","local"}).ToArray()));
+#endif
     }
     [Fact] public void RuntimeHeartbeatIsPeriodicInsteadOfBlockingEveryPlanLease()
     {

@@ -6,6 +6,27 @@ import html
 from dataclasses import dataclass
 from typing import Callable
 
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
+
+MAX_SOURCE_ANCHORS = 20000
+MAX_SOURCE_DIAGNOSTICS = 20000
+MAX_ANCHOR_PATH = 100
+
+
+def validate_source_collections(anchors: list[dict], diagnostics: list[dict]) -> None:
+    if len(anchors) > MAX_SOURCE_ANCHORS:
+        raise CapabilityBusinessError("knowledge_source_limit_exceeded", "Source anchor limit exceeded")
+    if len(diagnostics) > MAX_SOURCE_DIAGNOSTICS:
+        raise CapabilityBusinessError("knowledge_source_limit_exceeded", "Source diagnostics limit exceeded")
+    if any(len(anchor.get("path") or []) > MAX_ANCHOR_PATH for anchor in anchors):
+        raise CapabilityBusinessError("knowledge_source_limit_exceeded", "Source anchor path limit exceeded")
+
+
+def _diagnose(diagnostics: list[dict], issue: dict) -> None:
+    if len(diagnostics) >= MAX_SOURCE_DIAGNOSTICS:
+        raise CapabilityBusinessError("knowledge_source_limit_exceeded", "Source diagnostics limit exceeded")
+    diagnostics.append(issue)
+
 
 @dataclass(frozen=True)
 class ConversionResult:
@@ -37,7 +58,7 @@ def _inline(elements: list[dict], diagnostics: list[dict], block_id: str) -> str
                 if re.match(r"^https?://", link, re.I):
                     content = f"[{content}]({link.replace(')', '%29')})"
                 else:
-                    diagnostics.append({"block_id": block_id, "code": "unsafe_link", "detail": str(link)[:200]})
+                    _diagnose(diagnostics, {"block_id": block_id, "code": "unsafe_link", "detail": str(link)[:200]})
             chunks.append(content)
         elif element.get("mention_doc"):
             mention = element["mention_doc"]
@@ -47,23 +68,27 @@ def _inline(elements: list[dict], diagnostics: list[dict], block_id: str) -> str
                 chunks.append(f"[{title}]({url})")
             else:
                 chunks.append(title)
-                diagnostics.append({"block_id": block_id, "code": "mention_doc_unresolved"})
+                _diagnose(diagnostics, {"block_id": block_id, "code": "mention_doc_unresolved"})
         elif element.get("equation"):
             chunks.append(f"${element['equation'].get('content') or ''}$")
         else:
-            diagnostics.append({"block_id": block_id, "code": "unsupported_inline"})
+            _diagnose(diagnostics, {"block_id": block_id, "code": "unsupported_inline"})
     return "".join(chunks)
 
 
 def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], str] | None = None,
                    source_url: str = "") -> ConversionResult:
+    if len(blocks) > MAX_SOURCE_ANCHORS:
+        raise CapabilityBusinessError("knowledge_source_limit_exceeded", "Source block limit exceeded")
     by_id = {str(block.get("block_id")): block for block in blocks if block.get("block_id")}
     roots = [block for block in blocks if block.get("block_type") == 1]
     diagnostics: list[dict] = []
     anchors: list[dict] = []
     parts: list[str] = []
+    active: set[str] = set()
+    visits = 0
     if len(by_id) != len(blocks):
-        diagnostics.append({"block_id": "", "code": "duplicate_or_missing_block_id"})
+        _diagnose(diagnostics, {"block_id": "", "code": "duplicate_or_missing_block_id"})
     if len(roots) != 1:
         return ConversionResult("", [], diagnostics + [{"block_id": "", "code": "document_root_missing"}], False)
 
@@ -76,20 +101,20 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
     def plain_cell(cell_id: str) -> str:
         cell = by_id.get(cell_id)
         if not cell or cell.get("block_type") != 32:
-            diagnostics.append({"block_id": cell_id, "code": "table_cell_missing"})
+            _diagnose(diagnostics, {"block_id": cell_id, "code": "table_cell_missing"})
             return ""
         contents = []
         for child_id in cell.get("children") or []:
             child = by_id.get(child_id)
             if not child:
-                diagnostics.append({"block_id": child_id, "code": "table_cell_content_unsupported"})
+                _diagnose(diagnostics, {"block_id": child_id, "code": "table_cell_content_unsupported"})
                 continue
             if child.get("block_type") == 27:
-                diagnostics.append({"block_id": child_id, "code": "image_requires_manual_review", "detail": "表格内图片待核对"})
+                _diagnose(diagnostics, {"block_id": child_id, "code": "image_requires_manual_review", "detail": "表格内图片待核对"})
                 contents.append(visual_reference(child_id, "表格内图片"))
                 continue
             if child.get("block_type") not in {2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:
-                diagnostics.append({"block_id": child_id, "code": "table_cell_content_unsupported"})
+                _diagnose(diagnostics, {"block_id": child_id, "code": "table_cell_content_unsupported"})
                 contents.append(visual_reference(child_id, "表格单元格内容"))
                 continue
             key = "text" if child["block_type"] == 2 else f"heading{child['block_type'] - 2}"
@@ -97,13 +122,22 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
         return "<br>".join(contents).replace("|", "\\|").replace("\n", "<br>")
 
     def render(block_id: str, path: list[int], depth: int = 0, prefix: str = "") -> None:
+        nonlocal visits
+        if block_id in active:
+            raise CapabilityBusinessError("knowledge_source_cycle", "Source block cycle detected")
+        if len(path) > MAX_ANCHOR_PATH:
+            raise CapabilityBusinessError("knowledge_source_limit_exceeded", "Source anchor path limit exceeded")
+        visits += 1
+        if visits > MAX_SOURCE_ANCHORS:
+            raise CapabilityBusinessError("knowledge_source_limit_exceeded", "Source anchor traversal limit exceeded")
         def emit(value: str) -> None:
             parts.append(prefix + value + "\n")
 
         block = by_id.get(block_id)
         if not block:
-            diagnostics.append({"block_id": block_id, "code": "block_missing"})
+            _diagnose(diagnostics, {"block_id": block_id, "code": "block_missing"})
             return
+        active.add(block_id)
         kind = int(block.get("block_type") or 0)
         start = sum(map(len, parts))
         if 2 <= kind <= 17 and kind != 16:
@@ -141,25 +175,25 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
         elif kind == 27:
             token = str((block.get("image") or {}).get("token") or "")
             if not token or not resolve_asset:
-                diagnostics.append({"block_id": block_id, "code": "image_requires_manual_review", "detail": "图片待处理"})
+                _diagnose(diagnostics, {"block_id": block_id, "code": "image_requires_manual_review", "detail": "图片待处理"})
                 emit(visual_reference(block_id, "图片")); emit("")
             else:
                 try:
                     ref = resolve_asset(token, "image")
                     emit(f"![image]({ref})"); emit("")
                 except Exception as exc:
-                    diagnostics.append({"block_id": block_id, "code": "image_asset_unavailable", "detail": str(exc)[:200]})
+                    _diagnose(diagnostics, {"block_id": block_id, "code": "image_asset_unavailable", "detail": str(exc)[:200]})
                     emit(visual_reference(block_id, "图片")); emit("")
         elif kind in {30, 43}:
             label = "电子表格" if kind == 30 else "白板"
-            diagnostics.append({"block_id": block_id, "code": "embedded_visual_requires_manual_review", "detail": label})
+            _diagnose(diagnostics, {"block_id": block_id, "code": "embedded_visual_requires_manual_review", "detail": label})
             emit(visual_reference(block_id, label)); emit("")
         elif kind == 31:
             prop = (block.get("table") or {}).get("property") or {}
             rows, columns = int(prop.get("row_size") or 0), int(prop.get("column_size") or 0)
             cells = block.get("children") or []
             if not rows or not columns or rows * columns != len(cells) or rows > 500 or columns > 50:
-                diagnostics.append({"block_id": block_id, "code": "table_structure_incomplete"})
+                _diagnose(diagnostics, {"block_id": block_id, "code": "table_structure_incomplete"})
             else:
                 for row_no in range(rows):
                     values = [plain_cell(cells[row_no * columns + col]) for col in range(columns)]
@@ -168,8 +202,9 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
                         emit("| " + " | ".join(["---"] * columns) + " |")
                 emit("")
         else:
-            diagnostics.append({"block_id": block_id, "code": "unsupported_block", "block_type": kind})
+            _diagnose(diagnostics, {"block_id": block_id, "code": "unsupported_block", "block_type": kind})
         anchors.append({"block_id": block_id, "path": path, "start": start, "end": sum(map(len, parts))})
+        active.remove(block_id)
 
     for index, block_id in enumerate(roots[0].get("children") or []):
         render(block_id, [index])

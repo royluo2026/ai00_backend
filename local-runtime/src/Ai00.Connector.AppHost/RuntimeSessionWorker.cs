@@ -153,7 +153,17 @@ public sealed class OutcomeDelivery(RuntimeTransport transport,AppPlanJournal jo
             var useRecovery=original is null||original.ExpiresAt<=Now();
             try
             {
-                if(useRecovery&&(recovery is null||recovery.ExpiresAt<=Now()))recovery=await registerRecovery(ct);
+                if(useRecovery&&(recovery is null||recovery.ExpiresAt<=Now()))
+                {
+                    try{recovery=await registerRecovery(ct);}
+                    catch(RuntimeTransportException error)when(RuntimeSessionWorker.IsObsoleteRecovery(error.Message))
+                    {
+                        // Reuse the exact-plan server closure proof, including a
+                        // prior human disposition. An ACK conflict is not this proof.
+                        await RuntimeSessionWorker.RecoverOneAsync(outcome,journal,_=>Task.FromException(error),ct);
+                        return;
+                    }
+                }
                 if(await TryDeliverAsync(outcome,useRecovery?recovery!:original!,useRecovery,ct))return;
             }
             catch(RuntimeTransportException e)when(e.Message=="runtime_session_invalid")
@@ -163,7 +173,7 @@ public sealed class OutcomeDelivery(RuntimeTransport transport,AppPlanJournal jo
             catch(RuntimeTransportException e)when(useRecovery&&outcome.OverallStatus=="failed_without_effect"&&
                 e.Message is "outcome_acknowledgement_conflict" or "plan_lease_invalid")
             {
-                journal.Append("abandoned_without_effect",outcome.PlanId,"{}");return;
+                throw new RuntimeTransportException("outcome_recovery_required");
             }
             catch(RuntimeTransportException e)when(e.Message=="plan_lease_invalid")
             {
@@ -237,7 +247,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
     HostManifest manifest,IAppArtifactMaterializer artifactMaterializer,IAppCaptureUploader captureUploader,IHostApplicationLifetime lifetime,
     ViewerExecutionGate viewerGate,ViewerInteractionRuntimeContext viewerContext,LocalOpenCancellation? localOpenCancellation=null):BackgroundService
 {
-    internal const int PlanLeaseSeconds=300;
+    internal const int PlanLeaseSeconds=600;
     internal static async Task<RuntimeSession> RegisterAfterRecoveryAsync(
         Func<CancellationToken,Task<RuntimeSession>> register,
         Func<CancellationToken,Task> waitForRecovery,CancellationToken ct)
@@ -329,7 +339,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
             try
             {
                 // A newly leased plan needs the full supported lease budget.
-                if(session.ExpiresAt-DateTimeOffset.UtcNow<TimeSpan.FromSeconds(PlanLeaseSeconds))
+                if(session.ExpiresAt-DateTimeOffset.UtcNow<TimeSpan.FromSeconds(PlanLeaseSeconds+30))
                 {
                     var renewed=await transport.SendAsync(HttpMethod.Post,"runtime/renew",null,ct,session);
                     session=session with{ExpiresAt=renewed.GetProperty("expires_at").GetDateTimeOffset()};
@@ -375,8 +385,16 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
             journal.Append("acknowledged",outcome.PlanId,"{}");
         }
     }
-    private Task DeliverNormalAsync(OutcomeV2 outcome,RuntimeSession? original,string deviceId,string tenantId,long generation,string secret,CancellationToken ct) =>
-        new OutcomeDelivery(transport,journal).DeliverAsync(outcome,original,token=>RegisterAsync(deviceId,tenantId,generation,secret,outcome.PlanId,token),ct);
+    private async Task DeliverNormalAsync(OutcomeV2 outcome,RuntimeSession? original,string deviceId,string tenantId,long generation,string secret,CancellationToken ct)
+    {
+        try{await new OutcomeDelivery(transport,journal).DeliverAsync(outcome,original,token=>RegisterAsync(deviceId,tenantId,generation,secret,outcome.PlanId,token),ct);}
+        catch(RuntimeTransportException error)when(error.Message=="outcome_recovery_required")
+        {
+            try{await diagnostics.SendAsync(new{type="diagnostic",code="recovery_required"},ct);}
+            finally{lifetime.StopApplication();}
+            throw;
+        }
+    }
     private async Task<RuntimeSession> RestartAsync(RuntimeSession prior,CancellationToken ct)
     {
         var instance="app-"+Guid.NewGuid().ToString("N");

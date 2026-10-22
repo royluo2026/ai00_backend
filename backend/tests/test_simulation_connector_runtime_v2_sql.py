@@ -1131,7 +1131,7 @@ def test_v1_unresolved_plan_blocks_v2_registration(database):
         session(database)
 
 
-@pytest.mark.parametrize("seconds", [0, -1, 301])
+@pytest.mark.parametrize("seconds", [0, -1, 661])
 def test_session_expiry_is_bounded(database, seconds):
     with pytest.raises(ConnectorRepositoryError, match="runtime_session_expiry_invalid"):
         SimulationConnectorRepository().register_runtime_session(database[1], 7, "instance", NOW, NOW + timedelta(seconds=seconds))

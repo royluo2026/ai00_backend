@@ -10,7 +10,10 @@ from requests import HTTPError
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
 from backend.platform_sdk.feishu import user_credential
 from plugins.knowledge.knowledge_backend.data.connection import get_knowledge_conn
-from plugins.knowledge.knowledge_backend.feishu_markdown import convert_blocks
+from plugins.knowledge.knowledge_backend.feishu_markdown import (
+    MAX_ANCHOR_PATH, MAX_SOURCE_ANCHORS, MAX_SOURCE_DIAGNOSTICS,
+    convert_blocks, validate_source_collections,
+)
 from plugins.knowledge.knowledge_backend.feishu_source import read_document_blocks
 from plugins.knowledge.knowledge_backend.feishu_metadata import read_source_metadata
 from plugins.knowledge.knowledge_backend.ids import new_knowledge_id
@@ -66,6 +69,8 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
             code = None
         raise _feishu_read_error(code or (response.status_code if response is not None else None)) from exc
     except ValueError as exc:
+        if str(exc) == "Feishu document block limit exceeded":
+            raise CapabilityBusinessError("knowledge_source_limit_exceeded", "Source block limit exceeded") from exc
         match = re.search(r"Feishu (?:Docx read|Wiki lookup) failed: (\d+)", str(exc))
         if not match:
             raise
@@ -76,6 +81,7 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
     # The Knowledge import reads Docx blocks only. Images require a separate
     # reviewed path; the Feishu media download endpoint is not used here.
     converted = convert_blocks(blocks, source_url=source["document_url"])
+    validate_source_collections(converted.anchors, converted.diagnostics)
     markdown = converted.markdown
     data = markdown.encode("utf-8")
     if len(data) > 5_000_000:
@@ -181,6 +187,7 @@ def get_source_snapshot(payload: dict, context: CapabilityContext) -> Capability
         raise RuntimeError("OIS source snapshot unavailable")
     anchors = row["anchors_json"] if isinstance(row["anchors_json"], list) else json.loads(row["anchors_json"])
     diagnostics = row["diagnostics_json"] if isinstance(row["diagnostics_json"], list) else json.loads(row["diagnostics_json"])
+    validate_source_collections(anchors, diagnostics)
     result = {"snapshot_gid": gid, "source_gid": row["source_gid"], "document_token": row["document_token"],
               "markdown": markdown.decode("utf-8"), "sha256": row["content_sha256"],
               "anchors": anchors, "diagnostics": diagnostics,
@@ -206,7 +213,7 @@ def get_source_asset(payload: dict, context: CapabilityContext) -> dict:
 def register_feishu_source_capabilities(registry) -> None:
     common = {"owner": "knowledge", "subject_concepts": ("knowledge.source", "knowledge.document"), "plugin_callable": True}
     anchor = {"type": "object", "additionalProperties": False, "required": ["block_id", "path", "start", "end"],
-              "properties": {"block_id": {"type": "string"}, "path": {"type": "array", "items": {"type": "integer"}},
+              "properties": {"block_id": {"type": "string"}, "path": {"type": "array", "maxItems": MAX_ANCHOR_PATH, "items": {"type": "integer"}},
                              "start": {"type": "integer"}, "end": {"type": "integer"}}}
     diagnostic = {"type": "object", "additionalProperties": False, "required": ["block_id", "code"],
                   "properties": {"block_id": {"type": "string"}, "code": {"type": "string"},
@@ -215,8 +222,8 @@ def register_feishu_source_capabilities(registry) -> None:
         "required": ["snapshot_gid", "source_gid", "document_token", "markdown", "sha256", "anchors", "diagnostics", "complete"],
         "properties": {"snapshot_gid": {"type": "string"}, "source_gid": {"type": "string"}, "document_token": {"type": "string"},
                        "markdown": {"type": "string"}, "sha256": {"type": "string"},
-                       "anchors": {"type": "array", "items": anchor},
-                       "diagnostics": {"type": "array", "items": diagnostic}, "complete": {"type": "boolean"}}}
+                       "anchors": {"type": "array", "maxItems": MAX_SOURCE_ANCHORS, "items": anchor},
+                       "diagnostics": {"type": "array", "maxItems": MAX_SOURCE_DIAGNOSTICS, "items": diagnostic}, "complete": {"type": "boolean"}}}
     register_capability(registry, CapabilitySpec(
         **common, id="knowledge.source.pull", description="Pull one Feishu document into an unaccepted immutable Markdown source candidate.",
         use_when="An editor manually checks one linked Feishu document for changes.", do_not_use_when="Confirming a candidate as a Markdown revision.",

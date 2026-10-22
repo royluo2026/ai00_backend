@@ -87,7 +87,7 @@ class Variant(Closed):
     version: str = '1'
     base_version: str | None = None
     data_snapshot_ref: str | None = None
-    active_node_gids: list[str] | None = None
+    active_node_gids: list[str] | None = Field(default=None, max_length=500)
     node_overrides: dict[str,NodeOverride] = Field(default_factory=dict)
 
 

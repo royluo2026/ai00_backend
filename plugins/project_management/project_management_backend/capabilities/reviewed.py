@@ -200,6 +200,16 @@ def _application_result(data_schema: dict[str, Any]) -> dict[str, Any]:
 
 
 _ATOMIC_OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
+    **{
+        f"{entity}.create": _application_result(
+            _object({"gid": _TEXT, "name": _TEXT}, required=("gid", "name"))
+        )
+        for entity in ("projects", "vehicle_models")
+    },
+    **{
+        f"{entity}.{action}": _object({"success": {"type": "boolean"}}, required=("success",))
+        for entity in ("projects", "vehicle_models") for action in ("update", "delete")
+    },
     "projects.search": _application_result({"type": "array", "items": _PROJECT, "maxItems": 500}),
     "tasks.search": _application_result({"type": "array", "items": _WORK_ITEM, "maxItems": 500}),
     "issues.search": _application_result({"type": "array", "items": _WORK_ITEM, "maxItems": 500}),

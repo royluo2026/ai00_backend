@@ -170,6 +170,11 @@ internal sealed class TeamcenterReadOnlySession(Func<Process> startProcess)
         }
         catch(Exception error){child.Frames.Writer.TryComplete(error is ConnectorException?error:Invalid());}
     }
+    internal static async Task ConfirmWorkerExitAsync(Task exited,TimeSpan timeout)
+    {
+        try{await exited.WaitAsync(timeout);}
+        catch(TimeoutException){throw new ConnectorException("teamcenter_worker_cleanup_failed");}
+    }
     private async Task DropAsync(Child child,bool graceful)
     {
         lock(state){if(current==child)current=null;}
@@ -182,9 +187,9 @@ internal sealed class TeamcenterReadOnlySession(Func<Process> startProcess)
                 try{await child.Process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(2));}catch(TimeoutException){}
             }
             if(!child.Process.HasExited)child.Process.Kill();
-            await child.Process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(2));
+            await ConfirmWorkerExitAsync(child.Process.WaitForExitAsync(),TimeSpan.FromSeconds(2));
         }
-        catch(InvalidOperationException){}catch(TimeoutException){}
+        catch{throw new ConnectorException("teamcenter_worker_cleanup_failed");}
         finally
         {
             child.Drain.Cancel();

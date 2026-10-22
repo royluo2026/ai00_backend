@@ -172,3 +172,22 @@ def test_unpublished_simulation_preview_cannot_bypass_permission_or_revision_fai
             asyncio.run(adapter.get_execution_plan({"version_gid": "bop-1", "revision": 3}, object()))
         assert error.value.code == code
         assert calls == ["craft.bop.execution_structure.get"]
+
+
+def test_product_only_scene_has_no_knowledge_mapping_dependency_but_real_resources_remain_governed():
+    import pytest
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    adapter = GovernedSimulationRuntimeClient(Gateway())
+    calls = []
+    async def denied(invocation, context):
+        calls.append(invocation)
+        raise CapabilityBusinessError("permission_denied", "permission_denied")
+    adapter._invoke = denied
+    assert asyncio.run(adapter.resolve_resource_models([], object())) == {
+        "resolved": [], "unresolved": [], "ambiguous": [], "mapping_snapshot_hash": canonical_hash([]),
+    }
+    assert calls == []
+    with pytest.raises(CapabilityBusinessError, match="permission_denied"):
+        asyncio.run(adapter.resolve_resource_models([{"resource_type": "tool", "code": "T1"}], object()))
+    assert len(calls) == 1
+    assert calls[0].capability_id == "knowledge.resource_model_mapping.resolve"

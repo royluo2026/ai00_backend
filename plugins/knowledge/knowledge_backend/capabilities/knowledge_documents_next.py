@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 from typing import Any
 
@@ -429,7 +430,19 @@ def search_documents(payload: dict[str, Any], context: CapabilityContext) -> Cap
         }
         for row in rows
     ]
-    return CapabilityOutput(data={"items": items, "total": len(items), "query": query}, evidence=tuple(_evidence(row) for row in rows))
+    data = {"items": items, "total": len(items), "query": query}
+    evidence = tuple(_evidence(row) for row in rows)
+    if not evidence:
+        digest = hashlib.sha256(json.dumps(
+            {"tenant_gid": tenant, "user_gid": context.user_gid, "limit": limit, "data": data},
+            sort_keys=True, ensure_ascii=False, separators=(",", ":"),
+        ).encode("utf-8")).hexdigest()
+        evidence = (EvidenceRef(
+            kind="knowledge.document.search", reference="knowledge://documents/search", digest="sha256:" + digest,
+            summary="Completed tenant-scoped published document search with no matches",
+            metadata={"tenant_gid": tenant, "user_gid": context.user_gid, "returned_count": 0},
+        ),)
+    return CapabilityOutput(data=data, evidence=evidence)
 def list_document_revisions(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     tenant = _tenant(context)
     document_gid = str(payload.get("document_gid") or "").strip()

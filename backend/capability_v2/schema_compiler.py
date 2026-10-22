@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import json
 import re
+from contextlib import contextmanager
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from backend.capability_v2.schema_model import (
     ColumnSpec, ConstraintSpec, ExpectedSchema, IndexSpec, TableSpec,
 )
-from backend.db.versioned_migrations import normalize_oceanbase_sql, split_sql, strip_sql_comments
+from backend.db.versioned_migrations import (
+    MigrationError, _status_check_replacement, normalize_oceanbase_sql,
+    prepare_resumable_statement, split_sql, strip_sql_comments,
+)
 
 
 class SchemaCompileError(RuntimeError):
@@ -28,6 +32,25 @@ class _Table:
     indexes: dict[str, IndexSpec] = field(default_factory=dict)
     constraints: dict[str, ConstraintSpec] = field(default_factory=dict)
     sources: set[str] = field(default_factory=set)
+
+
+class _CompiledCheckMetadata:
+    """Supply projected CHECK metadata to the authoritative migration guard."""
+
+    def __init__(self, table: _Table):
+        self.table = table
+
+    @contextmanager
+    def cursor(self):
+        yield self
+
+    def execute(self, query, params):
+        if "information_schema.CHECK_CONSTRAINTS" not in query:
+            raise SchemaCompileError("unsupported_compiler_metadata_query")
+
+    def fetchall(self):
+        return [(item.name, item.expression) for item in self.table.constraints.values()
+                if item.kind == "check"]
 
 
 def _parts(text: str) -> list[str]:
@@ -92,29 +115,78 @@ def _normalize_data_type(value: str) -> str:
     return "".join(result)
 
 
+def _top_level_syntax(value: str) -> str:
+    """Mask literals and parenthesized expressions without moving SQL offsets."""
+    result = list(value)
+    depth, quote, index = 0, None, 0
+    while index < len(value):
+        char = value[index]
+        if quote:
+            result[index] = " "
+            if char == "\\" and index + 1 < len(value):
+                index += 1
+                result[index] = " "
+            elif char == quote:
+                if index + 1 < len(value) and value[index + 1] == quote:
+                    index += 1
+                    result[index] = " "
+                else:
+                    quote = None
+        elif char in "'\"`":
+            quote = char
+            result[index] = " "
+        elif char == "(":
+            depth += 1
+            result[index] = " "
+        elif char == ")":
+            depth -= 1
+            result[index] = " "
+        elif depth:
+            result[index] = " "
+        index += 1
+    if quote or depth:
+        raise SchemaCompileError("unbalanced_column_definition")
+    return "".join(result)
+
+
 def _column(definition: str, source: str) -> ColumnSpec:
     match = re.match(rf"^\s*{IDENT}\s+(.+)$", definition, re.S)
     if not match:
         raise SchemaCompileError(f"unsupported_column:{source}:1")
-    name, tail = match.group(1).lower(), " ".join(match.group(2).split())
+    name, tail = match.group(1).lower(), match.group(2).strip()
     keyword = re.search(
-        r"\s+(?=NOT\s+NULL|NULL\b|DEFAULT\b|AUTO_INCREMENT\b|PRIMARY\s+KEY|UNIQUE\b|COMMENT\b|COLLATE\b|CHARACTER\s+SET|ON\s+UPDATE|GENERATED\b|REFERENCES\b|AFTER\b|FIRST\b)",
-        tail, re.I,
+        r"\b(?:NOT\s+NULL|NULL\b|DEFAULT\b|AUTO_INCREMENT\b|PRIMARY\s+KEY|UNIQUE\b|COMMENT\b|COLLATE\b|CHARACTER\s+SET|ON\s+UPDATE|GENERATED\b|REFERENCES\b|AFTER\b|FIRST\b)",
+        _top_level_syntax(tail), re.I,
     )
     data_type = _normalize_data_type((tail[:keyword.start()] if keyword else tail).strip())
     attrs = tail[keyword.start():].strip() if keyword else ""
-    nullable = not bool(re.search(r"\bNOT\s+NULL\b", attrs, re.I))
+    syntax = _top_level_syntax(attrs)
+    nullable = not bool(re.search(r"\bNOT\s+NULL\b", syntax, re.I))
     default = None
-    default_match = re.search(
+    default_keyword = re.search(r"\bDEFAULT\b", syntax, re.I)
+    default_match = re.match(
         r"\bDEFAULT\s+((?:'(?:''|\\.|[^'])*')|(?:\"(?:\"\"|\\.|[^\"])*\")|(?:\([^)]*\))|(?:[^\s,]+))",
-        attrs, re.I,
-    )
+        attrs[default_keyword.start():], re.I,
+    ) if default_keyword else None
     if default_match: default = default_match.group(1)
     extra = []
-    if re.search(r"\bAUTO_INCREMENT\b", attrs, re.I): extra.append("AUTO_INCREMENT")
-    update = re.search(r"\bON\s+UPDATE\s+([^\s,]+(?:\([^)]*\))?)", attrs, re.I)
+    if re.search(r"\bAUTO_INCREMENT\b", syntax, re.I): extra.append("AUTO_INCREMENT")
+    update_keyword = re.search(r"\bON\s+UPDATE\b", syntax, re.I)
+    update = re.match(r"\bON\s+UPDATE\s+([^\s,]+(?:\([^)]*\))?)", attrs[update_keyword.start():], re.I) if update_keyword else None
     if update: extra.append("ON UPDATE " + update.group(1).upper())
-    return ColumnSpec(name, data_type, nullable, default, " ".join(extra), (source,))
+    generation_expression = None
+    generated = re.search(r"\bGENERATED\s+(?:ALWAYS\s+)?AS\b", syntax, re.I)
+    if generated:
+        expression_start = generated.end()
+        expression_end = re.search(r"\S", syntax[expression_start:])
+        expression_end = expression_start + expression_end.start() if expression_end else len(attrs)
+        expression = attrs[expression_start:expression_end].strip()
+        if not (expression.startswith("(") and expression.endswith(")")):
+            raise SchemaCompileError(f"unsupported_generated_column:{source}:1")
+        generation_expression = expression[1:-1].strip()
+        storage = re.match(r"(STORED|VIRTUAL)\b", syntax[expression_end:], re.I)
+        extra.append((storage.group(1).upper() if storage else "VIRTUAL") + " GENERATED")
+    return ColumnSpec(name, data_type, nullable, default, " ".join(extra), (source,), generation_expression)
 
 
 def _merge_column(table: _Table, column: ColumnSpec, source: str, *, replace_existing=False):
@@ -139,18 +211,32 @@ def _merge_index(table: _Table, index: IndexSpec, source: str):
     )
 
 
+def _unnamed_index_name(table: _Table, column: str) -> str:
+    match = re.match(IDENT, column)
+    if not match:
+        raise SchemaCompileError(f"unsupported_unnamed_index:{table.name}:{column}")
+    base = match.group(1)
+    name, suffix = base, 2
+    while name.lower() in {existing.lower() for existing in table.indexes}:
+        name = f"{base}_{suffix}"
+        suffix += 1
+    return name
+
+
 def _table_item(table: _Table, item: str, source: str):
     constraint_name = None
     constrained = re.match(rf"^CONSTRAINT\s+{IDENT}\s+(.+)$", item, re.I | re.S)
     if constrained: constraint_name, item = constrained.group(1), constrained.group(2)
     primary = re.match(r"^PRIMARY\s+KEY\s*\((.+)\)", item, re.I | re.S)
-    index = re.match(rf"^(UNIQUE\s+)?(?:KEY|INDEX)\s+{IDENT}\s*\((.+)\)", item, re.I | re.S)
+    index = re.fullmatch(rf"^(?:(UNIQUE)\s*(?:(?:KEY|INDEX)\s*)?|(?:KEY|INDEX)\s*)(?:{IDENT}\s*)?\((.+)\)", item, re.I | re.S)
     foreign = re.match(rf"^FOREIGN\s+KEY\s*\((.+?)\)\s+REFERENCES\s+([^\s(]+)\s*\((.+?)\)", item, re.I | re.S)
     check = re.match(r"^CHECK\s*\((.+)\)$", item, re.I | re.S)
     if primary:
         _merge_index(table, IndexSpec("PRIMARY", _index_columns(primary.group(1)), True, True, (source,)), source)
     elif index:
-        _merge_index(table, IndexSpec(index.group(2), _index_columns(index.group(3)), bool(index.group(1)), False, (source,)), source)
+        columns = _index_columns(index.group(3))
+        name = index.group(2) or constraint_name or _unnamed_index_name(table, columns[0])
+        _merge_index(table, IndexSpec(name, columns, bool(index.group(1)), False, (source,)), source)
     elif foreign:
         name = constraint_name or f"fk_{table.name}_{len(table.constraints)+1}"
         table.constraints[name] = ConstraintSpec(name, "foreign_key", _index_columns(foreign.group(1)),
@@ -159,12 +245,14 @@ def _table_item(table: _Table, item: str, source: str):
         name = constraint_name or f"check_{table.name}_{len(table.constraints)+1}"
         table.constraints[name] = ConstraintSpec(name, "check", expression=check.group(1).strip(), sources=(source,))
     else:
+        if constraint_name or re.match(r"^(?:UNIQUE|KEY|INDEX|PRIMARY|FOREIGN|CHECK|FULLTEXT|SPATIAL)\b", item, re.I):
+            raise SchemaCompileError(f"unsupported_table_item:{source}:1:{item[:40]}")
         column = _column(item, source)
         _merge_column(table, column, source)
-        if re.search(r"\bPRIMARY\s+KEY\b", item, re.I):
+        if re.search(r"\bPRIMARY\s+KEY\b", _top_level_syntax(item), re.I):
             _merge_index(table, IndexSpec("PRIMARY", (column.name,), True, True, (source,)), source)
-        if re.search(r"\bUNIQUE\b", item, re.I):
-            _merge_index(table, IndexSpec(f"uq_{table.name}_{column.name}", (column.name,), True, False, (source,)), source)
+        if re.search(r"\bUNIQUE\b", _top_level_syntax(item), re.I):
+            _merge_index(table, IndexSpec(_unnamed_index_name(table, column.name), (column.name,), True, False, (source,)), source)
 
 
 def _resolve_files(root: Path, paths: list[str]) -> list[Path]:
@@ -231,6 +319,22 @@ def compile_expected_schema(root: Path) -> ExpectedSchema:
                 name = _identifier(alter.group(1), source)
                 if name not in tables: raise SchemaCompileError(f"alter_before_create:{name}:{source}:1")
                 table = tables[name]; table.sources.add(source)
+                replacement = _status_check_replacement(raw)
+                if replacement:
+                    try:
+                        prepared = prepare_resumable_statement(_CompiledCheckMetadata(table), raw)
+                    except MigrationError as exc:
+                        raise SchemaCompileError(f"invalid_status_check_replacement:{source}:1:{exc}") from exc
+                    if prepared is None:
+                        continue
+                    if replacement[0] == "retire":
+                        # The placeholder denotes the old expression, not its generated name.
+                        retired = re.fullmatch(r"ALTER TABLE `[^`]+` DROP CHECK `([^`]+)`", prepared)
+                        if not retired:
+                            raise SchemaCompileError(f"unsupported_status_check_retirement:{source}:1")
+                        del table.constraints[retired.group(1)]
+                        continue
+                    # Keep the logical ADD name; physical names depend on runtime prefix.
                 for action in _parts(alter.group(2)):
                     drop_primary = re.match(r"^DROP\s+PRIMARY\s+KEY$", action, re.I)
                     add_primary = re.match(r"^ADD\s+PRIMARY\s+KEY\s*\((.+)\)$", action, re.I | re.S)
@@ -238,6 +342,7 @@ def compile_expected_schema(root: Path) -> ExpectedSchema:
                     modify = re.match(r"^MODIFY\s+(?:COLUMN\s+)?(?:IF\s+EXISTS\s+)?(.+)$", action, re.I | re.S)
                     change = re.match(rf"^CHANGE\s+(?:COLUMN\s+)?{IDENT}\s+{IDENT}\s+(.+)$", action, re.I | re.S)
                     add_index = re.match(rf"^ADD\s+(UNIQUE\s+)?(?:KEY|INDEX)\s+(?:IF\s+NOT\s+EXISTS\s+)?{IDENT}\s*\((.+)\)$", action, re.I | re.S)
+                    add_constraint = re.match(r"^ADD\s+((?:CONSTRAINT\s+|CHECK\s*\(|FOREIGN\s+KEY\b|UNIQUE\b|KEY\b|INDEX\b|FULLTEXT\b|SPATIAL\b).+)$", action, re.I | re.S)
                     if drop_primary:
                         table.indexes.pop("PRIMARY", None)
                     elif add_primary:
@@ -246,11 +351,13 @@ def compile_expected_schema(root: Path) -> ExpectedSchema:
                         )
                     elif add_index:
                         _merge_index(table, IndexSpec(add_index.group(2), _index_columns(add_index.group(3)), bool(add_index.group(1)), False, (source,)), source)
+                    elif add_constraint:
+                        _table_item(table, add_constraint.group(1), source)
                     elif add_column:
                         column = _column(add_column.group(2), source)
                         if add_column.group(1) and any(item.name == column.name for item in table.columns):
                             continue
-                        _merge_column(table, column, source)
+                        _table_item(table, add_column.group(2), source)
                     elif modify:
                         _merge_column(table, _column(modify.group(1), source), source, replace_existing=True)
                     elif change:

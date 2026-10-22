@@ -147,11 +147,19 @@ def _refs() -> dict:
 def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
     registry = CapabilityRegistry()
     register_capabilities(registry)
-    registrations = {item.spec.id: item for item in registry.snapshot()}
-    assert set(registrations) == CAPABILITY_IDS
-    for capability_id, registration in registrations.items():
+    registrations = {item.spec.id: item for item in registry.snapshot() if item.spec.version == 1}
+    # This acceptance case covers reproducibility contracts; additional viewer,
+    # cache and connector contracts have their own acceptance suites.
+    assert CAPABILITY_IDS <= set(registrations)
+    for capability_id in sorted(CAPABILITY_IDS):
+        registration = registrations[capability_id]
         descriptor = registration.descriptor
         assert descriptor.owner_domain == "simulation", capability_id
+        if capability_id in {'simulation.capture_run.start', 'simulation.document_snapshot.request',
+                             'simulation.environment.materialize'}:
+            assert descriptor.lifecycle_status == 'deprecated'
+            assert not any(descriptor.exposure.model_dump().values())
+            continue
         expected_lifecycle = "experimental" if capability_id in EXPERIMENTAL_IDS else "stable"
         assert descriptor.lifecycle_status == expected_lifecycle, capability_id
         if (
@@ -163,6 +171,14 @@ def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
             assert descriptor.exposure.local_runtime
             assert not descriptor.exposure.web and not descriptor.exposure.plugin
             assert not descriptor.exposure.agent and not descriptor.exposure.mcp
+        elif capability_id in {
+            'simulation.connector.binding.get',
+            'simulation.connector.pairing.summary.get',
+            'simulation.connector.pairing.approve',
+        }:
+            assert descriptor.exposure.web
+            assert not any((descriptor.exposure.plugin, descriptor.exposure.agent,
+                            descriptor.exposure.mcp, descriptor.exposure.local_runtime))
         else:
             assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
         assert descriptor.input_schema["additionalProperties"] is False

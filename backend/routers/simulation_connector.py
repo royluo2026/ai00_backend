@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from typing import Literal
-from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2, ConnectorPlanOutcomeV2, IDENTITY_PATTERN
+from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2, ConnectorPlanOutcomeV2, IDENTITY_PATTERN, MAX_PLAN_LEASE_SECONDS
 from plugins.simulation.simulation_backend.application.connector_protocol_v2 import ConnectorReconciliationEvidenceV2
 from plugins.simulation.simulation_backend.application.connector_runtime_sessions import runtime_session_service
 from plugins.simulation.simulation_backend.capabilities.connector_pairing import app_pairing_service
@@ -65,6 +65,11 @@ class ConnectorHeartbeatBody(ConnectorHealth):
 class ConnectorLeaseBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
     lease_seconds: int = Field(default=60, ge=15, le=300)
+
+
+class RuntimeLeaseBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    lease_seconds: int = Field(default=60, ge=15, le=MAX_PLAN_LEASE_SECONDS)
 
 
 class ConnectorCompleteBody(BaseModel):
@@ -555,7 +560,7 @@ def runtime_restart(body: RuntimeRestartBody, pins: dict = Depends(_runtime_auth
 
 
 @router.post('/v2/plans/lease')
-def runtime_lease(body: ConnectorLeaseBody, pins: dict = Depends(_runtime_pins)):
+def runtime_lease(body: RuntimeLeaseBody, pins: dict = Depends(_runtime_pins)):
     # lease_v2_plan authenticates under the same device lock as the lease write.
     # A separate authentication transaction only repeats the lock/DB round trip.
     return _transport(lambda: runtime_session_service.lease(**pins, lease_seconds=body.lease_seconds))

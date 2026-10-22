@@ -7,9 +7,12 @@ import json
 import re
 import secrets
 
-from backend.contracts.connector_execution_plan_v2 import IDENTITY_PATTERN
+from backend.contracts.connector_execution_plan_v2 import IDENTITY_PATTERN, RUNTIME_SESSION_MAX_SECONDS
 from ..data.connector_repository import SimulationConnectorRepository, ConnectorRepositoryError
 from ..domain.connector_pairing import verify_possession
+
+# Normal sessions cover one maximum lease plus bounded outcome-delivery margin.
+RUNTIME_SESSION_SECONDS = RUNTIME_SESSION_MAX_SECONDS
 
 
 class RuntimeSessionService:
@@ -47,7 +50,7 @@ class RuntimeSessionService:
     def register(self, device_id, generation, runtime_instance_id, *, device_credential, runtime_type, challenge, signature):
         self._prove(device_id, generation, runtime_instance_id, device_credential, runtime_type, challenge, signature)
         now = self.clock()
-        return self.repository.register_runtime_session(device_id, generation, runtime_instance_id, now, now + timedelta(minutes=5))
+        return self.repository.register_runtime_session(device_id, generation, runtime_instance_id, now, now + timedelta(seconds=RUNTIME_SESSION_SECONDS))
 
     def authenticate(self, token, *, device_id, generation, runtime_instance_id, runtime_type):
         return self.repository.authenticate_runtime(device_id, generation, runtime_instance_id, token, self.clock(), runtime_type)
@@ -70,7 +73,7 @@ class RuntimeSessionService:
         if not reason.strip() or len(reason) > 1024:
             raise ConnectorRepositoryError('runtime_takeover_audit_required')
         now = self.clock()
-        self.repository.force_takeover(device_id, generation, generation + 1, runtime_instance_id, now, now + timedelta(minutes=5),
+        self.repository.force_takeover(device_id, generation, generation + 1, runtime_instance_id, now, now + timedelta(seconds=RUNTIME_SESSION_SECONDS),
             expected_runtime_instance_id=row['current_runtime_instance_id'], expected_session_token_hash=row['session_token_hash'],
             actor_id=actor_id, reason=reason, require_registration=True)
         return {'device_id': device_id, 'runtime_generation': generation + 1, 'runtime_instance_id': runtime_instance_id,
@@ -83,13 +86,13 @@ class RuntimeSessionService:
 
     def renew(self, token, **pins):
         now = self.clock()
-        return self.repository.renew_runtime(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, now, now + timedelta(minutes=5))
+        return self.repository.renew_runtime(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, now, now + timedelta(seconds=RUNTIME_SESSION_SECONDS))
 
     def restart(self, new_runtime_instance_id, token, **pins):
         now = self.clock()
         return self.repository.restart_runtime_session(
             pins['device_id'], pins['generation'], pins['runtime_instance_id'], token,
-            new_runtime_instance_id, now, now + timedelta(minutes=5),
+            new_runtime_instance_id, now, now + timedelta(seconds=RUNTIME_SESSION_SECONDS),
         )
 
     def lease(self, token, *, lease_seconds=60, **pins):

@@ -88,6 +88,13 @@ def _index_column(value: str) -> str:
 
 
 def _column(column: ColumnSpec) -> str:
+    if column.generation_expression is not None:
+        storage = re.fullmatch(r"(STORED|VIRTUAL) GENERATED", column.extra, re.I)
+        if not storage or column.default is not None:
+            raise SchemaPlanError(f"invalid_generated_column:{column.name}")
+        return (f"{_quote(column.name)} {column.data_type} GENERATED ALWAYS AS "
+                f"({column.generation_expression}) {storage.group(1).upper()} "
+                f"{'NULL' if column.nullable else 'NOT NULL'}")
     result = f"{_quote(column.name)} {column.data_type} {'NULL' if column.nullable else 'NOT NULL'}"
     if column.default is not None: result += f" DEFAULT {_default(column.default)}"
     if column.extra: result += " " + column.extra

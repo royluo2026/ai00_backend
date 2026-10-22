@@ -148,7 +148,7 @@ class SqlCaptureWorkflowRepository:
             if cursor.rowcount != 1:
                 raise SimulationWorkflowError("materialization_run_not_found")
 
-    def get_capture_run(self, capture_run_id, context):
+    def get_capture_run(self, capture_run_id, context, *, include_plans=True):
         visibility = "" if context is None else " AND (owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s))"
         params: tuple[Any, ...] = (capture_run_id,)
         if context is not None:
@@ -162,8 +162,9 @@ class SqlCaptureWorkflowRepository:
             run = cursor.fetchone()
             if not run:
                 return None
+            plan_column='plan_json' if include_plans else 'NULL AS plan_json'
             cursor.execute(
-                "SELECT operation_id,sequence,status,attempt,artifact_ref_json,plan_json,artifact_attached,expected_scene_hash "
+                f"SELECT operation_id,sequence,status,attempt,artifact_ref_json,{plan_column},artifact_attached,expected_scene_hash "
                 "FROM workmanship_sim_capture_steps WHERE capture_run_id=%s ORDER BY sequence DESC,operation_id DESC",
                 (capture_run_id,),
             )
@@ -304,7 +305,15 @@ class CaptureRunProvider:
         action = self._call(
             self.workflow.next_materialization_action, payload["run_id"], context,
         )
-        return CapabilityOutput(data={"action": self._project_action(action)})
+        return self._evidenced({"action": self._project_action(action)}, "materialization", payload["run_id"], "action")
+
+    @staticmethod
+    def _evidenced(data, resource, identifier, action="state"):
+        return CapabilityOutput(data=data, evidence=(EvidenceRef(
+            kind=f"simulation.{resource}.{action}",
+            reference=f"simulation://{resource}/{identifier}/{action}",
+            digest=canonical_hash(data),
+        ),))
 
     async def dispatch_materialization(self, payload, context):
         row = await self._call_async(
@@ -315,18 +324,21 @@ class CaptureRunProvider:
             "run_id", "environment_id", "environment_version", "manifest_hash",
             "device_id", "plan_id", "status", "operation_ref",
         )}
-        return CapabilityOutput(data=data)
+        return self._evidenced(data, "materialization", payload["run_id"], "dispatch")
 
     async def start(self, payload, context):
-        row = await self._call_async(self.workflow.start_capture, payload["environment_id"], payload["environment_version"], payload["device_id"], context)
+        try:
+            row = await self.workflow.start_capture(payload["environment_id"], payload["environment_version"], payload["device_id"], context, continuous=payload.get('execution_mode')=='continuous')
+        except SimulationWorkflowError as exc:
+            raise CapabilityBusinessError(str(exc),str(exc)) from exc
         return CapabilityOutput(data=_project_capture(row), evidence=(EvidenceRef(kind="simulation.capture_run", reference=f"simulation://capture/{row['capture_run_id']}", digest=row["manifest_hash"]),))
 
     def get(self, payload, context):
-        return CapabilityOutput(data=_project_capture(self._call(self.workflow.get, payload["capture_run_id"], context)))
+        return self._evidenced(_project_capture(self._call(self.workflow.get, payload["capture_run_id"], context)), "capture", payload["capture_run_id"])
 
     def action(self, payload, context):
         action = self._call(self.workflow.next_action, payload["capture_run_id"], context)
-        return CapabilityOutput(data={"action": self._project_action(action)})
+        return self._evidenced({"action": self._project_action(action)}, "capture", payload["capture_run_id"], "action")
 
     async def dispatch(self, payload, context):
         row = await self._call_async(
@@ -335,13 +347,13 @@ class CaptureRunProvider:
             context.confirmation_token,
             context,
         )
-        return CapabilityOutput(data=_project_capture(row))
+        return self._evidenced(_project_capture(row), "capture", payload["capture_run_id"], "dispatch")
 
     def cancel(self, payload, context):
-        return CapabilityOutput(data=self._call(self.workflow.cancel, payload["capture_run_id"], context))
+        return self._evidenced(self._call(self.workflow.cancel, payload["capture_run_id"], context), "capture", payload["capture_run_id"], "cancel")
 
     async def retry(self, payload, context):
-        return CapabilityOutput(data=await self._call_async(self.workflow.retry_step, payload["capture_run_id"], payload["operation_id"], context))
+        return self._evidenced(await self._call_async(self.workflow.retry_step, payload["capture_run_id"], payload["operation_id"], context), "capture", payload["capture_run_id"], "retry")
 
 
 default_provider = CaptureRunProvider(CaptureWorkflow(

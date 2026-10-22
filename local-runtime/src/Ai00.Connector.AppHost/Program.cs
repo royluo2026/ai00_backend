@@ -24,7 +24,7 @@ public static class Program
             var verified=HostManifest.Verify(options);using var parent=verified.Parent;
             // The App-owned test host has its own identity, journal and cache. It
             // never consumes state from the separately installed Connector service.
-            var root=StateRoot(options.Development);
+            var root=StateRoot(options.Development,options.StateDirectory);
             var stateSuffix=options.Development?".test":"";
             using var key=new DeviceSigningKeyStore(root).GetOrCreate();
             var security=new DirectorySecurity();var sid=WindowsIdentity.GetCurrent().User!;
@@ -102,7 +102,7 @@ public static class Program
     }
     internal static void RegisterTeamcenterRuntime(IServiceCollection services,TeamcenterReadOnlyRuntime runtime)
         =>services.AddSingleton(_=>runtime); // factory registration transfers disposal ownership to the host
-    internal static string StateRoot(bool development)=>Path.Combine(
+    internal static string StateRoot(bool development,string? explicitRoot=null)=>explicitRoot is not null?Path.GetFullPath(explicitRoot):Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "AI00","App",development?"Connector-Test":"Connector");
     private static async Task MonitorParentAsync(System.Diagnostics.Process parent,IHostApplicationLifetime lifetime,CancellationToken ct)

@@ -4,6 +4,10 @@ from __future__ import annotations
 import difflib
 from dataclasses import dataclass
 
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
+
+MAX_MERGE_CONFLICTS = 1000
+
 
 @dataclass(frozen=True)
 class MergeResult:
@@ -43,6 +47,8 @@ def merge_markdown(base: str, incoming: str, local: str) -> MergeResult:
         if overlapping:
             if len(overlapping) == 1 and source == overlapping[0]:
                 continue
+            if len(conflicts) >= MAX_MERGE_CONFLICTS:
+                raise CapabilityBusinessError("knowledge_source_conflict_limit_exceeded", "Source merge conflict limit exceeded")
             conflicts.append({
                 "base_range": [min([source[0]] + [item[0] for item in overlapping]),
                                max([source[1]] + [item[1] for item in overlapping])],

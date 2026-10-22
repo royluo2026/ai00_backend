@@ -703,6 +703,13 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
 
     by_id = {(spec.id, spec.version): (spec, descriptor) for spec, descriptor in registry.items}
     assert set(by_id) == {
+        ('simulation.environment.cache_source.live_document.bind', 1),
+        ('simulation.environment.cache_source.live_document.resume', 1),
+        ('simulation.environment.live_document.resume_online', 1),
+        ('simulation.environment.online_source.live_document.bind', 3),
+        ('simulation.teamcenter.visualization.insert.request', 2),
+        ('simulation.teamcenter.visualization.launch.request', 3),
+        ('simulation.vismockup.document.existing_identity.read.request', 1),
         ('simulation.viewer.interaction.scope.get', 1),
         ('simulation.viewer.interaction.authorize', 1),
         ('simulation.environment.online_source.live_document.bind', 2),

@@ -93,6 +93,7 @@ public sealed partial class VisMockupAdapter
             await File.WriteAllTextAsync(packagePath,xml.ToString(SaveOptions.DisableFormatting),new UTF8Encoding(false),ct);
         } catch(Exception ex) {
             var code=ex is ConnectorException ce?ce.Code:ex is OperationCanceledException?"cancelled":ex is UnauthorizedAccessException?"cache_local_path_forbidden":ex is IOException?"cache_local_io_failed":"cache_local_materialization_failed";Log("local_materialization_failed",code:code);
+            if(ex is ConnectorException {Code:"teamcenter_worker_cleanup_failed"})throw;
             throw new ConnectorNoEffectException(code);
         }
         try {cache.Trim(TimeSpan.FromDays(7),10L*1024*1024*1024);LocalModelPackages.Trim(Path.Combine(root,"packages"),TimeSpan.FromDays(7));}
@@ -103,6 +104,9 @@ public sealed partial class VisMockupAdapter
             if(ct.IsCancellationRequested)throw new ConnectorNoEffectException("cache_open_interrupted");
             try{if(_teamcenter.LocalFileCachePrincipal!=principal)throw new ConnectorNoEffectException("teamcenter_session_changed");}
             catch(ConnectorException rejected){throw new ConnectorNoEffectException(rejected.Code);}
+            // Application acquisition can launch the product; subsequent native
+            // rejections cannot prove that no document or process was changed.
+            try {
             var application=_connection.RequireActiveApplication(true);var before=RequireProcessIdentity();
             LocalModelPackages.Protect(directory,before.ProcessId!.Value,before.ProcessStartUtcTicks!.Value);
             InvalidateViewerStructure();
@@ -114,6 +118,7 @@ public sealed partial class VisMockupAdapter
             Log("native_open_completed");
             return new{protocol="ai00.viewer.opened-tc-cache.v1",cache_binding=binding,package_hash=hash,files=proofs,
                 document_identity=new{document_session=CanonicalJson.Hash(native),native.process_id,native.process_started_utc_ticks,native.document_handle}};
+            }catch(ConnectorNoEffectException rejected){throw new ConnectorException(rejected.Code);}
         });
     }
 }

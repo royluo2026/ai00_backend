@@ -112,12 +112,12 @@ def build_materialization_plan(
     )
 
 
-def build_capture_plan(
+def _build_capture_plan(
     manifest: SimulationEnvironmentManifestV1,
     *, plan_id: str, device_id: str, tenant_id: str, user_id: str, issued_at: datetime,
     operations: Iterable[str] | None = None, attempt: int = 1,
     capture_run_id: str | None = None,
-    capability_version_gid: str, business_definition_hash: str,
+    capability_version_gid: str, business_definition_hash: str, continuous: bool = False,
 ) -> ConnectorExecutionPlanV1:
     requirements = {
         item.operation_id: item.contract_hash for item in manifest.connector_requirement.operations
@@ -131,7 +131,7 @@ def build_capture_plan(
     ]
     if not ordered:
         raise ValueError("capture_plan_empty")
-    if len(ordered) != 1:
+    if not continuous and len(ordered) != 1:
         raise ValueError("capture_plan_requires_one_operation")
     steps: list[ConnectorStepV1] = []
 
@@ -186,6 +186,15 @@ def build_capture_plan(
     )
 
 
+def build_capture_plan(manifest, **kwargs):
+    return _build_capture_plan(manifest, **kwargs)
+
+
+def build_capture_batch_plan(manifest, **kwargs):
+    """One finite plan, one exact confirmation, distinct signed upload step per image."""
+    return _build_capture_plan(manifest, continuous=True, **kwargs)
+
+
 def build_document_snapshot_plan(
     *, plan_id: str, device_id: str, tenant_id: str, user_id: str, issued_at: datetime,
     capability_version_gid: str, business_definition_hash: str,
@@ -215,4 +224,4 @@ def build_document_snapshot_plan(
     return ConnectorExecutionPlanV1(**raw, plan_hash=draft.compute_hash())
 
 
-__all__ = ["build_capture_plan", "build_document_snapshot_plan", "build_materialization_plan"]
+__all__ = ["build_capture_plan", "build_capture_batch_plan", "build_document_snapshot_plan", "build_materialization_plan"]

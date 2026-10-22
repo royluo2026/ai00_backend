@@ -12,6 +12,32 @@ public sealed class ReverseCaptureRendererTests : IDisposable
     private readonly string _directory = Path.Combine(Path.GetTempPath(), "ai00-reverse-render", Guid.NewGuid().ToString("N"));
     private static readonly CaptureProfile Profile = new("png", 1920, 1080, "current");
 
+    [Fact]
+    public void GrayValidationSeparatesSmallCornerCoordinateOverlayFromColoredGeometry()
+    {
+        using var bitmap = new Bitmap(1920, 1080);
+        using var graphics = Graphics.FromImage(bitmap);
+        graphics.Clear(Color.White);
+        graphics.FillRectangle(Brushes.Gray, 650, 400, 200, 100);
+        graphics.FillRectangle(Brushes.Red, 200, 950, 150, 3);
+        graphics.FillRectangle(Brushes.Lime, 200, 850, 3, 100);
+        var file = Path.Combine(_directory, "coordinate-overlay.png");
+        Directory.CreateDirectory(_directory);
+        bitmap.Save(file, ImageFormat.Png);
+        CapturePixels.Read(file, Profile).RequireGrayScene();
+
+        graphics.FillRectangle(Brushes.Blue, 800, 400, 200, 100);
+        bitmap.Save(file, ImageFormat.Png);
+        Assert.Equal("capture_gray_baseline_invalid", Assert.Throws<ConnectorException>(() =>
+            CapturePixels.Read(file, Profile).RequireGrayScene()).Code);
+
+        graphics.FillRectangle(Brushes.Gray, 800, 400, 200, 100);
+        graphics.FillRectangle(Brushes.Blue, 200, 850, 100, 100);
+        bitmap.Save(file, ImageFormat.Png);
+        Assert.Equal("capture_gray_baseline_invalid", Assert.Throws<ConnectorException>(() =>
+            CapturePixels.Read(file, Profile).RequireGrayScene()).Code);
+    }
+
     private static FakeDocument Document()
     {
         var document = new FakeDocument("document", "tc://test", new FakeNode("root", "Root", "root", "root", [

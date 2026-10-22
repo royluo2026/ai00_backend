@@ -19,7 +19,7 @@ from backend.contracts.connector_execution_plan_v1 import (
     canonical_hash,
 )
 from backend.contracts.connector_execution_plan_v2 import (
-    PROTOCOL_V2, IDENTITY_PATTERN, ConnectorExecutionPlanV2,
+    PROTOCOL_V2, IDENTITY_PATTERN, MAX_PLAN_LEASE_SECONDS, RUNTIME_SESSION_MAX_SECONDS, ConnectorExecutionPlanV2,
     ConnectorPlanOutcomeV2, canonicalize_v2,
 )
 
@@ -267,13 +267,20 @@ class SimulationConnectorRepository:
     def renew_runtime(self, device_id, generation, instance, token, now, expires_at):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             row = self._authenticated_runtime(cursor, device_id, generation, instance, token, now)
-            if not 0 < (_utc(expires_at) - _utc(now)).total_seconds() <= 300:
+            if not 0 < (_utc(expires_at) - _utc(now)).total_seconds() <= RUNTIME_SESSION_MAX_SECONDS:
                 raise ConnectorRepositoryError('runtime_session_expiry_invalid')
             cursor.execute('UPDATE workmanship_sim_connector_runtime_devices SET session_expires_at=%s,updated_at=%s '
                 'WHERE device_id=%s AND runtime_generation=%s AND current_runtime_instance_id=%s AND session_token_hash=%s',
                 (expires_at, now, device_id, generation, instance, row['session_token_hash']))
             if cursor.rowcount != 1:
-                raise ConnectorRepositoryError('runtime_session_conflict')
+                if cursor.rowcount != 0:
+                    raise ConnectorRepositoryError('runtime_session_conflict')
+                # Changed-row semantics return zero for a renewal already applied
+                # at the same clock tick. Recheck the fence and both exact values.
+                confirmed = self._authenticated_runtime(cursor, device_id, generation, instance, token, now)
+                if (_utc(confirmed['session_expires_at']) != _utc(expires_at)
+                        or _utc(confirmed['updated_at']) != _utc(now)):
+                    raise ConnectorRepositoryError('runtime_session_conflict')
             self._runtime_audit(cursor, row, 'session_renewed', now)
             return {'expires_at': expires_at}
 
@@ -594,7 +601,7 @@ class SimulationConnectorRepository:
         now, expires_at = _utc(now), _utc(expires_at)
         if not re.fullmatch(IDENTITY_PATTERN, instance):
             raise ConnectorRepositoryError("runtime_instance_invalid")
-        if not 0 < (expires_at - now).total_seconds() <= 300:
+        if not 0 < (expires_at - now).total_seconds() <= RUNTIME_SESSION_MAX_SECONDS:
             raise ConnectorRepositoryError("runtime_session_expiry_invalid")
         cls._retire_queued_plans(cursor, row, now)
         token = secrets.token_urlsafe(32)
@@ -840,7 +847,7 @@ class SimulationConnectorRepository:
 
     def lease_v2_plan(self, device_id, runtime_generation, runtime_instance_id, session_token, now, lease_seconds=60):
         now = _utc(now)
-        lease_seconds = max(1, min(int(lease_seconds), 300))
+        lease_seconds = max(1, min(int(lease_seconds), MAX_PLAN_LEASE_SECONDS))
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             row = self._authenticated_runtime(cursor, device_id, runtime_generation, runtime_instance_id, session_token, now)
             identity = (device_id, PROTOCOL_V2, runtime_generation, runtime_instance_id, row["session_token_hash"])

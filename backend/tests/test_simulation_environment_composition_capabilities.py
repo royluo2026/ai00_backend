@@ -141,7 +141,8 @@ def _context():
 def test_compose_persists_one_manifest_when_all_bindings_resolve():
     provider, repository = _provider()
 
-    output = asyncio.run(provider.compose(_payload(), _context())).data
+    result = asyncio.run(provider.compose(_payload(), _context()))
+    output = result.data
 
     assert output["status"] == "composed"
     assert output["manifest_hash"].startswith("sha256:")
@@ -152,10 +153,13 @@ def test_compose_returns_every_problem_and_persists_nothing():
     provider, repository = _provider(unresolved=True)
     provider.craft_port = CraftPort(_execution(product="P-X"))
 
-    output = asyncio.run(provider.compose(_payload(), _context())).data
+    result = asyncio.run(provider.compose(_payload(), _context()))
+    output = result.data
 
     assert output["status"] == "unresolved"
     assert {item["source_code"] for item in output["problems"]} == {"P-X", "T-10"}
+    assert result.evidence[0].kind == "simulation.environment.binding_report"
+    assert result.evidence[0].digest.startswith("sha256:")
     assert repository.manifests == {}
 
 
@@ -163,13 +167,15 @@ def test_preflight_checks_exact_connector_contracts_without_queueing_work():
     provider, _ = _provider()
     composed = asyncio.run(provider.compose(_payload(), _context())).data
 
-    report = asyncio.run(provider.preflight({
+    result = asyncio.run(provider.preflight({
         "environment_id": composed["environment_id"],
         "environment_version": composed["environment_version"],
         "device_id": "device-1",
-    }, _context())).data
+    }, _context()))
+    report = result.data
 
     assert report == {"compatible": True, "problems": []}
+    assert result.evidence[0].kind == "simulation.environment.preflight"
 
 
 def test_preflight_accepts_authenticated_app_v2_adapter_for_prepared_v1_intent():

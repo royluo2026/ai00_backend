@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:c40f1ded41cf807a34a20b83d1e654ca3aed33699aa0962decaa2fbc61006188",
+  "schema_sha256": "sha256:c612bf7650eddcf1002de430b8d60120ab0f37825de1cf89ada59347ec4b029d",
   "schema_version": 1,
   "tables": [
     {
@@ -529,7 +529,7 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "revision": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -562,7 +562,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ],
       "table": "workmanship_agent_orch_axis_views"
     },
@@ -596,7 +597,7 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "tenant_gid": [
           "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
@@ -632,7 +633,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ],
       "table": "workmanship_agent_orch_business_nodes"
     },
@@ -666,7 +668,7 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "purpose": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -702,7 +704,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ],
       "table": "workmanship_agent_orch_capability_bindings"
     },
@@ -718,7 +721,7 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "purpose": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -763,7 +766,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ],
       "table": "workmanship_agent_orch_context_bindings"
     },
@@ -785,7 +789,7 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "route_points_json": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -818,7 +822,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ],
       "table": "workmanship_agent_orch_flow_edges"
     },
@@ -831,7 +836,7 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "relation_type": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -864,7 +869,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ],
       "table": "workmanship_agent_orch_item_edges"
     },
@@ -886,7 +892,7 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "sequence_no": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -916,7 +922,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ],
       "table": "workmanship_agent_orch_items"
     },
@@ -986,6 +993,29 @@
     },
     {
       "columns": {
+        "panorama_gid": [
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+        ],
+        "uq_agent_orch_organization_panorama": [
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+      ],
+      "table": "workmanship_agent_orch_organization_roots"
+    },
+    {
+      "columns": {
         "created_at": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
@@ -1002,10 +1032,13 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "revision": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "scope_kind": [
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "tenant_gid": [
           "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
@@ -1029,7 +1062,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ],
       "table": "workmanship_agent_orch_panoramas"
     },
@@ -1173,7 +1207,7 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+          "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
         ],
         "published_at": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -1209,7 +1243,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ],
       "table": "workmanship_agent_orch_versions"
     },
@@ -1298,6 +1333,35 @@
         "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
       ],
       "table": "workmanship_agent_orch_workload_baselines"
+    },
+    {
+      "columns": {
+        "definition_json": [
+          "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+        ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+        ],
+        "version_gid": [
+          "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+        ],
+        "idx_agent_orch_workspace_scope": [
+          "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+      ],
+      "table": "workmanship_agent_orch_workspaces"
     },
     {
       "columns": {
@@ -2561,16 +2625,16 @@
         "PRIMARY": [
           "backend/db/mysql_schema.sql"
         ],
+        "idx_pm_global": [
+          "backend/db/mysql_schema.sql"
+        ],
         "idx_pm_project": [
           "backend/db/mysql_schema.sql"
         ],
         "idx_pm_scope": [
           "backend/db/mysql_schema.sql"
         ],
-        "idx_pm_unique_global": [
-          "backend/db/mysql_schema.sql"
-        ],
-        "idx_pm_unique_scoped": [
+        "idx_pm_scoped": [
           "backend/db/mysql_schema.sql"
         ],
         "idx_pm_user": [
@@ -10374,6 +10438,76 @@
     },
     {
       "columns": {
+        "base_revision_gid": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "markdown": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "user_gid": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+      ],
+      "table": "workmanship_know_document_drafts"
+    },
+    {
+      "columns": {
+        "changed_at": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "changed_by": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "from_maturity": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "to_maturity": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
+        "idx_know_maturity_document": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+      ],
+      "table": "workmanship_know_document_maturity_events"
+    },
+    {
+      "columns": {
         "created_at": [
           "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql"
         ],
@@ -10386,11 +10520,20 @@
         "gid": [
           "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql"
         ],
+        "maturity": [
+          "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+        ],
         "published_revision_gid": [
           "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql"
         ],
         "slug": [
           "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql"
+        ],
+        "source_author_name": [
+          "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
+        ],
+        "source_author_open_id": [
+          "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
         ],
         "source_entry_gid": [
           "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql"
@@ -10428,7 +10571,9 @@
       },
       "sources": [
         "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql",
-        "backend/db/migrations/domains/knowledge/0001_knowledge.sql"
+        "backend/db/migrations/domains/knowledge/0001_knowledge.sql",
+        "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql",
+        "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
       ],
       "table": "workmanship_know_documents"
     },
@@ -10587,6 +10732,77 @@
     },
     {
       "columns": {
+        "body": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "card_type": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "evidence_from": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "evidence_sha256": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "evidence_text": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "evidence_to": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "revision_gid": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "target_gid": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "title": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "updated_by": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "idx_know_extraction_document": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ],
+        "idx_know_extraction_status": [
+          "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+      ],
+      "table": "workmanship_know_extraction_candidates"
+    },
+    {
+      "columns": {
         "created_at": [
           "backend/db/mysql_schema.sql"
         ],
@@ -10608,6 +10824,327 @@
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_know_favorites"
+    },
+    {
+      "columns": {
+        "byte_size": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "content_sha256": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "feishu_token": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "media_type": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "object_key": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "snapshot_gid": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "source_gid": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "idx_know_feishu_asset_snapshot": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "uq_know_feishu_asset_identity": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+      ],
+      "table": "workmanship_know_feishu_assets"
+    },
+    {
+      "columns": {
+        "accepted_revision_gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "snapshot_gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "source_gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "updated_by": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+      ],
+      "table": "workmanship_know_feishu_baselines"
+    },
+    {
+      "columns": {
+        "app_token": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "source_url": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "table_id": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "updated_by": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+      ],
+      "table": "workmanship_know_feishu_catalog_config"
+    },
+    {
+      "columns": {
+        "active": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "document_token": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "document_url": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "error_code": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "record_id": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "source_gid": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "title": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "idx_know_feishu_catalog_status": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "uq_know_feishu_catalog_record": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+      ],
+      "table": "workmanship_know_feishu_catalog_records"
+    },
+    {
+      "columns": {
+        "changed": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "request_sha256": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "revision_gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "revision_no": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "snapshot_gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "source_gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "idx_know_feishu_import_source": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ],
+        "uq_know_feishu_import_request": [
+          "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+      ],
+      "table": "workmanship_know_feishu_imports"
+    },
+    {
+      "columns": {
+        "anchors_json": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "byte_size": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "complete": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "content_sha256": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "diagnostics_json": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "document_token": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "object_key": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "source_author_name": [
+          "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
+        ],
+        "source_author_open_id": [
+          "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
+        ],
+        "source_gid": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ],
+        "idx_know_source_snapshot": [
+          "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql",
+        "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
+      ],
+      "table": "workmanship_know_feishu_snapshots"
+    },
+    {
+      "columns": {
+        "active": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "catalog_record_gid": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "document_token": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "document_url": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "linked_document_gid": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ],
+        "idx_know_feishu_source_record": [
+          "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+      ],
+      "table": "workmanship_know_feishu_sources"
     },
     {
       "columns": {
@@ -10683,10 +11220,10 @@
         "PRIMARY": [
           "backend/db/migrations/domains/knowledge/0003_display_counters.sql"
         ],
-        "idx_know_item_history_item_created": [
+        "id": [
           "backend/db/migrations/domains/knowledge/0003_display_counters.sql"
         ],
-        "uq_workmanship_know_item_history_id": [
+        "idx_know_item_history_item_created": [
           "backend/db/migrations/domains/knowledge/0003_display_counters.sql"
         ]
       },
@@ -13160,7 +13697,7 @@
         "PRIMARY": [
           "backend/db/migrations/202608030004_device_control_plane.sql"
         ],
-        "uq_workmanship_runtime_enrollments_token_hash": [
+        "token_hash": [
           "backend/db/migrations/202608030004_device_control_plane.sql"
         ]
       },
@@ -13192,6 +13729,60 @@
         "backend/db/migrations/domains/device/0001_device.sql"
       ],
       "table": "workmanship_runtime_schema_migrations"
+    },
+    {
+      "columns": {
+        "batch_id": [
+          "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+        ],
+        "chunk_index": [
+          "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+        ],
+        "chunk_text": [
+          "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+        ]
+      },
+      "constraints": {
+        "fk_workmanship_sim_cache_assembly_preparation_chunks_1": [
+          "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+      ],
+      "table": "workmanship_sim_cache_assembly_preparation_chunks"
+    },
+    {
+      "columns": {
+        "batch_id": [
+          "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+        ],
+        "preparation_hash": [
+          "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+        ],
+        "preparation_json": [
+          "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+        ]
+      },
+      "constraints": {
+        "fk_workmanship_sim_cache_assembly_preparations_1": [
+          "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+      ],
+      "table": "workmanship_sim_cache_assembly_preparations"
     },
     {
       "columns": {
@@ -13374,6 +13965,268 @@
         "backend/db/migrations/domains/simulation/0006_capture_dispatch_compatibility.sql"
       ],
       "table": "workmanship_sim_capture_steps"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "batch_id": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "completed_at": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "connector_device_id": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "display_name": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "error_code": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "fields_json": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "node_count": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "phase": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "preparation_error": [
+          "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+        ],
+        "preparation_status": [
+          "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+        ],
+        "principal_hash": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "project_gid": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "project_name": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "request_hash": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "request_key": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "selector_json": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "source_hash": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "trigger_kind": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "ix_cloud_cache_project": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "ix_cloud_cache_worker": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "uq_cloud_cache_request": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql",
+        "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+      ],
+      "table": "workmanship_sim_cloud_cache_batches"
+    },
+    {
+      "columns": {
+        "batch_id": [
+          "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+        ],
+        "manifest_json": [
+          "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+        ]
+      },
+      "constraints": {
+        "fk_workmanship_sim_cloud_cache_manifests_1": [
+          "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+      ],
+      "table": "workmanship_sim_cloud_cache_manifests"
+    },
+    {
+      "columns": {
+        "batch_id": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "data_json": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "node_key": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "parent_node_key": [
+          "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+        ],
+        "sibling_order": [
+          "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+        ],
+        "snapshot_generation": [
+          "backend/db/migrations/domains/simulation/0032_cloud_model_cache_snapshot_coverage.sql"
+        ],
+        "snapshot_position": [
+          "backend/db/migrations/domains/simulation/0032_cloud_model_cache_snapshot_coverage.sql"
+        ]
+      },
+      "constraints": {
+        "fk_workmanship_sim_cloud_cache_nodes_1": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "ix_cloud_cache_parent_order": [
+          "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+        ],
+        "uq_cloud_cache_snapshot_position": [
+          "backend/db/migrations/domains/simulation/0032_cloud_model_cache_snapshot_coverage.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql",
+        "backend/db/migrations/domains/simulation/0032_cloud_model_cache_snapshot_coverage.sql",
+        "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+      ],
+      "table": "workmanship_sim_cloud_cache_nodes"
+    },
+    {
+      "columns": {
+        "batch_id": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "body_hash": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "receipt_key": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ]
+      },
+      "constraints": {
+        "fk_workmanship_sim_cloud_cache_receipts_1": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+      ],
+      "table": "workmanship_sim_cloud_cache_receipts"
+    },
+    {
+      "columns": {
+        "attempt": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "batch_id": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "kind": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "operation_id": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "payload_json": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "task_key": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ]
+      },
+      "constraints": {
+        "fk_workmanship_sim_cloud_cache_tasks_1": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "ix_cloud_cache_task": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+      ],
+      "table": "workmanship_sim_cloud_cache_tasks"
+    },
+    {
+      "columns": {
+        "next_version": [
+          "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+        ],
+        "phase": [
+          "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+        ],
+        "project_gid": [
+          "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+      ],
+      "table": "workmanship_sim_cloud_cache_versions"
     },
     {
       "columns": {
@@ -13586,7 +14439,7 @@
         "PRIMARY": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
         ],
-        "uq_workmanship_sim_connector_enrollments_token_hash": [
+        "token_hash": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
         ]
       },
@@ -14209,6 +15062,9 @@
         "activated_at": [
           "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
         ],
+        "adapter_health_json": [
+          "backend/db/migrations/domains/simulation/0023_connector_app_adapter_health.sql"
+        ],
         "created_at": [
           "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
         ],
@@ -14301,7 +15157,8 @@
       "sources": [
         "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql",
         "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql",
-        "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql",
+        "backend/db/migrations/domains/simulation/0023_connector_app_adapter_health.sql"
       ],
       "table": "workmanship_sim_connector_runtime_devices"
     },
@@ -14312,6 +15169,45 @@
         ],
         "attempts": [
           "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "cache_file_batch": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "cache_file_batch_generation": [
+          "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
+        ],
+        "cache_file_batch_plan": [
+          "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
+        ],
+        "cache_file_batch_snapshot_hash": [
+          "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
+        ],
+        "cache_file_content_hash": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "cache_file_dataset": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "cache_file_expected_content_hash": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "cache_file_generation": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "cache_file_member_digest": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "cache_file_node": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "cache_file_revision": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "cache_file_snapshot_hash": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "cache_file_uid": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
         ],
         "created_at": [
           "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
@@ -14381,11 +15277,11 @@
         "check_workmanship_sim_connector_runtime_plans_2": [
           "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
         ],
-        "check_workmanship_sim_connector_runtime_plans_3": [
-          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
-        ],
         "check_workmanship_sim_connector_runtime_plans_4": [
           "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "sim_runtime_plan_status_recovery": [
+          "backend/db/migrations/domains/simulation/0027_connector_manual_recovery_status.sql"
         ]
       },
       "indexes": {
@@ -14395,6 +15291,15 @@
         "idx_sim_runtime_plan_lease": [
           "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
         ],
+        "ix_cache_file_batch_receipts": [
+          "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
+        ],
+        "ix_cache_file_completed_member": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
+        "ix_cache_file_completed_page": [
+          "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+        ],
         "uq_sim_runtime_plan_idempotency": [
           "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
         ],
@@ -14403,7 +15308,10 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql",
+        "backend/db/migrations/domains/simulation/0027_connector_manual_recovery_status.sql",
+        "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql",
+        "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
       ],
       "table": "workmanship_sim_connector_runtime_plans"
     },
@@ -15002,6 +15910,80 @@
     },
     {
       "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "request_hash": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "response_json": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+      ],
+      "table": "workmanship_sim_live_document_adoptions"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "connector_device_id": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "document_session": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "session_identity_hash": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "state": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_live_document_workspace": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+      ],
+      "table": "workmanship_sim_live_document_bindings"
+    },
+    {
+      "columns": {
         "created_at": [
           "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
         ],
@@ -15127,6 +16109,81 @@
     },
     {
       "columns": {
+        "bom_view_uid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "configuration_date": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "display_name": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "endpoint_id": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "inserted_at": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "insertion_instance_id": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "item_revision_uid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "object_uid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "revision_rule": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "source_identity_hash": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "source_selector_json": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_online_source_document": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "fk_sim_online_source_workspace": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "ix_sim_online_source_lookup": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "uq_sim_online_source_identity": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+      ],
+      "table": "workmanship_sim_online_model_sources"
+    },
+    {
+      "columns": {
         "content_hash": [
           "backend/db/migrations/202608100010_simulation_reproducibility.sql"
         ],
@@ -15172,6 +16229,42 @@
         "backend/db/migrations/domains/simulation/0001_simulation.sql"
       ],
       "table": "workmanship_sim_parameter_sets"
+    },
+    {
+      "columns": {
+        "algorithm_version": [
+          "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+        ],
+        "dependency_signature": [
+          "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+        ],
+        "payload_json": [
+          "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+        ],
+        "source_sha256": [
+          "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_plmxml_tree_document": [
+          "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+      ],
+      "table": "workmanship_sim_plmxml_product_tree_cache"
     },
     {
       "columns": {
@@ -15223,6 +16316,108 @@
         "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
       ],
       "table": "workmanship_sim_plmxml_restore_requests"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "cursor_value": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "node_count": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "observation_gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "page_hash": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "page_index": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "payload_json": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_product_structure_chunk_observation": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+      ],
+      "table": "workmanship_sim_product_structure_chunks"
+    },
+    {
+      "columns": {
+        "captured_at": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "complete": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "manifest_hash": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "node_count": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "observation_id": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "page_count": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "schema_version": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "source_gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_product_structure_observation_source": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "fk_sim_product_structure_observation_workspace": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "ix_sim_product_structure_source_time": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ],
+        "uq_sim_product_structure_observation": [
+          "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+      ],
+      "table": "workmanship_sim_product_structure_observations"
     },
     {
       "columns": {
@@ -15453,6 +16648,164 @@
         "backend/db/migrations/domains/simulation/0001_simulation.sql"
       ],
       "table": "workmanship_sim_schema_migrations"
+    },
+    {
+      "columns": {
+        "authorization_operation_id": [
+          "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+        ],
+        "grant_id": [
+          "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+        ],
+        "proof_digest": [
+          "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+        ],
+        "proof_json": [
+          "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+      ],
+      "table": "workmanship_sim_viewer_grant_evidence"
+    },
+    {
+      "columns": {
+        "device_id": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "event_digest": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "event_json": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "grant_id": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "interaction_id": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "received_at": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "request_id": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "sequence": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "idx_sim_viewer_event_grant": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+      ],
+      "table": "workmanship_sim_viewer_interaction_events"
+    },
+    {
+      "columns": {
+        "expires_at": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "grant_generation": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "grant_id": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "issued_at": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "session_nonce": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "source_association_id": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "uq_sim_viewer_grant_generation": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+      ],
+      "table": "workmanship_sim_viewer_interaction_grants"
+    },
+    {
+      "columns": {
+        "active": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "actor_gid": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "device_id": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "document_session": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "runtime_generation": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "runtime_instance_id": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "source_association_id": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "source_revision": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "idx_sim_viewer_source_workspace": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+      ],
+      "table": "workmanship_sim_viewer_source_associations"
     },
     {
       "columns": {

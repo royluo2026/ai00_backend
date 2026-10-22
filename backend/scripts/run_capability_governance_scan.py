@@ -31,7 +31,7 @@ EXPECTED_OFFICIAL_DOMAINS = (
 )
 # Catalog commit 46209c0dd adds craft.resource_requirement.get@1 to stable.
 # This is a checked-in inventory pin, not approval or runtime release evidence.
-PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT = 546
+PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT = 569
 
 
 def _inside_repository(path: Path) -> Path:

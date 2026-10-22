@@ -390,4 +390,11 @@ OUTPUT_SCHEMAS = {
     "simulation.connector_environment_runtime_outcome.apply": OUTCOME_APPLY_OUTPUT,
 }
 
+# Major 1 is closed. Major 2 remains prepare-only; continuous execution still
+# needs a separate confirmation for the exact finite Connector plan.
+INPUT_SCHEMAS[("simulation.capture_run.start",2)] = obj({
+    **INPUT_SCHEMAS['simulation.capture_run.start']['properties'],
+    'execution_mode':{'type':'string','enum':['serial','continuous']},
+},('environment_id','environment_version','device_id'))
+
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]

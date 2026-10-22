@@ -47,9 +47,11 @@ public sealed class TeamcenterModelFileTests
     {
         public long Size{get;init;}=32L;
         public List<string> Commands{get;}=[];
+        public Func<object,CancellationToken,Task<JsonElement>>? CacheFile{get;init;}
         public Task<JsonElement> ReadCacheBulkAsync(string command,object payload,string username,string password,CancellationToken ct)
         {
             Commands.Add(command);
+            if(command=="cache_file"&&CacheFile is not null)return CacheFile(payload,ct);
             if(command=="cache_file_preflight")
             {
                 var preflightPayload=JsonSerializer.SerializeToElement(payload);

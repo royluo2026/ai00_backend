@@ -319,9 +319,9 @@ OUTPUT_SCHEMAS.update({
     "base.runtime.data_environment.active.get": _object({"prefix": _DATA_PREFIX}, ("prefix",)),
     "base.runtime.data_environment.get": _object({
         "active_prefix": _DATA_PREFIX, "baseline_prefix": _DATA_PREFIX, "pending": BOOLEAN,
-        "switch_enabled": BOOLEAN, "options": {"type": "array", "items": _object({
+        "switch_enabled": BOOLEAN, "options": {"type": "array", "maxItems": 3, "items": _object({
             "prefix": _DATA_PREFIX, "name": STRING, "available": BOOLEAN, "difference_count": INTEGER,
-            "reasons": {"type": "array", "items": STRING},
+            "reasons": {"type": "array", "maxItems": 30, "items": STRING},
         }, ("prefix", "name", "available", "difference_count", "reasons"))},
     }, ("active_prefix", "baseline_prefix", "pending", "switch_enabled", "options")),
     "base.runtime.data_environment.change.apply": _object({

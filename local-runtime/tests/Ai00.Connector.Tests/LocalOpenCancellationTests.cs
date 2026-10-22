@@ -34,7 +34,33 @@ public sealed class LocalOpenCancellationTests
             Assert.Equal(queued?0:1,adapter.Calls);Assert.False(worker.ExecutionQuarantined);
         } finally {if(Directory.Exists(root))Directory.Delete(root,true);}
     }
-    private sealed class CancelledAdapter:IConnectorAdapter
+    [Theory]
+    [InlineData("proven")]
+    [InlineData("cleanup_failed")]
+    [InlineData("native_completed")]
+    [InlineData("post_native_rejection")]
+    public async Task Deadline_requires_completed_pre_native_cleanup_proof(string cleanup)
+    {
+        var root=Path.Combine(Path.GetTempPath(),"ai00-deadline-test-"+Guid.NewGuid().ToString("N"));
+        try {
+            var now=DateTimeOffset.Parse("2026-09-07T01:03:00Z");
+            var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+            var step=plan["steps"]![0]!.AsObject();step["operation_id"]="vismockup.model.open@3";
+            step["contract_hash"]=CancelledAdapter.Hash;step["side_effect_classification"]="write";
+            step["post_condition_probe_id"]="vismockup.document.identity@1";step["timeout_seconds"]=1;
+            using var signing=ProtocolV2VectorTests.TestKey("plan");ProtocolV2VectorTests.SignPlan(plan,signing);
+            using var device=(DeviceSigningKey)typeof(DeviceSigningKey).GetConstructors(System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).Single().Invoke([ProtocolV2VectorTests.TestKey("device")]);
+            var adapter=new CancelledAdapter(cleanup);
+            var worker=new PlanExecutionWorker(new AppPlanJournal(Path.Combine(root,"journal")),adapter,device,"device-key-001",
+                new Dictionary<string,TrustedPlanKey>{{"cloud-plan-key-2026-09",new(ProtocolV2VectorTests.Vector["plan_public_jwk"]!.ToJsonString(),now.AddDays(-1),now.AddDays(1),false)}},()=>now);
+            var result=await worker.ExecuteAsync(new("lease-002",now.AddMinutes(2),plan.ToJsonString()),new("device-001","tenant-001",7,"runtime-instance-001","session-secret",now.AddMinutes(3)),default);
+            Assert.Equal(cleanup=="proven"?"failed_without_effect":"outcome_unknown",result.OverallStatus);
+            Assert.Equal(cleanup!="proven",worker.ExecutionQuarantined);
+            Assert.Equal(cleanup!="proven",worker.RequiresProcessRestart);
+            if(cleanup=="proven")Assert.Equal("cache_open_interrupted",result.Steps[0].GetProperty("error_code").GetString());
+        } finally {if(Directory.Exists(root))Directory.Delete(root,true);}
+    }
+    private sealed class CancelledAdapter(string? cleanup=null):IConnectorAdapter
     {
         public const string Hash="sha256:ae5547ff86c1d537cefe34098c68c0e8bbbec1aa20df850996767022029bf4d3";
         public TaskCompletionSource Started{get;}=new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -44,7 +70,13 @@ public sealed class LocalOpenCancellationTests
         public async Task<AdapterResult> ExecuteAsync(AdapterOperation operation,CancellationToken ct)
         {
             Calls++;Started.SetResult();
-            try{await Task.Delay(Timeout.Infinite,ct);}catch(OperationCanceledException){throw new ConnectorNoEffectException("cache_open_interrupted");}
+            try{await Task.Delay(Timeout.Infinite,ct);}catch(OperationCanceledException){
+                if(cleanup is not null)await Task.Delay(30);
+                if(cleanup=="cleanup_failed")throw new ConnectorException("teamcenter_worker_cleanup_failed");
+                if(cleanup=="native_completed")return new AdapterResult(true,new{});
+                if(cleanup=="post_native_rejection")throw new ConnectorNoEffectException("cache_environment_structure_changed");
+                throw new ConnectorNoEffectException("cache_open_interrupted");
+            }
             throw new InvalidOperationException("must not reach native open");
         }
     }

@@ -106,6 +106,38 @@ def connector_plan(step_schema: dict, *, max_steps: int) -> dict:
 CONNECTOR_PLAN = connector_plan(CONNECTOR_STEP, max_steps=10000)
 DOCUMENT_SNAPSHOT_CONNECTOR_PLAN = connector_plan(DOCUMENT_SNAPSHOT_STEP, max_steps=1)
 
+# Queue @3 accepts only the finite prepared materialization/capture vocabulary.
+# The legacy free-form step schema is intentionally not expanded for @1.
+from ..domain.environment_manifest import ResourceBindingV1, SceneStateV1, REQUIRED_CONNECTOR_OPERATIONS
+_resource_binding_schema = ResourceBindingV1.model_json_schema()
+_scene_schema = SceneStateV1.model_json_schema()
+_workflow_defs = {**_resource_binding_schema.pop('$defs', {}), **_scene_schema.pop('$defs', {})}
+_scene_fields = {'document_id': STRING, 'baseline_snapshot_hash': HASH,
+                 'operation_id': STRING, 'scene': _scene_schema}
+_workflow_payloads = {
+    'vismockup.application.probe@1': obj({'allow_launch': {'type': 'boolean', 'const': False}}, ('allow_launch',)),
+    'vismockup.model.attach@1': obj({'document_id': STRING, 'baseline_snapshot_hash': HASH,
+                                   'binding': _resource_binding_schema}, ('document_id', 'baseline_snapshot_hash', 'binding')),
+    'vismockup.scene.apply@1': obj(_scene_fields, tuple(_scene_fields)),
+    'vismockup.scene.render@1': obj({**_scene_fields,
+        'highlight_products': {'type': 'array', 'items': STRING, 'maxItems': 250000},
+        'fit_all': {'type': 'boolean'}}, (*_scene_fields, 'highlight_products', 'fit_all')),
+    'vismockup.scene.verify@1': obj({'document_id': STRING, 'operation_id': STRING,
+                                    'expected_scene_hash': HASH}, ('document_id', 'operation_id', 'expected_scene_hash')),
+    'vismockup.view.capture@1': obj({'operation_id': STRING, 'capture_run_id': STRING, 'attempt': {'type': 'integer', 'minimum': 1},
+        'format': {'const': 'png', 'type': 'string'}, 'width': {'const': 1920, 'type': 'integer'},
+        'height': {'const': 1080, 'type': 'integer'}, 'background': {'const': 'current', 'type': 'string'},
+        'artifact_resource_refs': {'type': 'array', 'items': STRING, 'minItems': 1, 'maxItems': 128}},
+        ('operation_id', 'capture_run_id', 'attempt',
+         'format', 'width', 'height', 'background', 'artifact_resource_refs')),
+}
+WORKFLOW_CONNECTOR_PLAN = connector_plan({'oneOf': [obj({
+    **CONNECTOR_STEP['properties'], 'operation_id': {'type': 'string', 'const': operation},
+    'contract_hash': {'type': 'string', 'const': REQUIRED_CONNECTOR_OPERATIONS[operation]},
+    'payload': payload,
+}, tuple(CONNECTOR_STEP['required'])) for operation, payload in _workflow_payloads.items()]}, max_steps=10000)
+WORKFLOW_QUEUE_INPUT = {**obj({'plan': WORKFLOW_CONNECTOR_PLAN}, ('plan',)), '$defs': _workflow_defs}
+
 SOURCE_SELECTOR = obj({
     "endpoint_id": {"type":"string","minLength":1,"maxLength":128},
     "object_uid": {"type":"string","minLength":1,"maxLength":128},
@@ -317,9 +349,7 @@ INPUT_SCHEMAS = {
     ("simulation.connector.plan.queue", 2): obj(
         {"plan": DOCUMENT_SNAPSHOT_CONNECTOR_PLAN}, ("plan",),
     ),
-    ("simulation.connector.plan.queue", 3): obj(
-        {"plan": CONNECTOR_PLAN}, ("plan",),
-    ),
+    ("simulation.connector.plan.queue", 3): WORKFLOW_QUEUE_INPUT,
     "simulation.vismockup.application.attach.request": obj({}, ()),
     "simulation.vismockup.application.launch.request": obj({}, ()),
     "simulation.vismockup.model.open.request": obj({"artifact_ref": ARTIFACT_REF}, ("artifact_ref",)),

@@ -19,6 +19,8 @@ def test_published_official_registry_bootstraps_without_database_or_test_overrid
 
 def test_published_catalog_binds_all_runtime_providers(monkeypatch):
     from backend.capability_v2 import gateway
+    from backend.capability_v2.catalog import CatalogResolver, load_catalog_release
+    from backend.capability_v2.catalog_store import InMemoryCatalogStore
 
     monkeypatch.setattr(gateway, '_default_gateway', None)
     registry = build_capability_registry(ROOT)
@@ -27,6 +29,13 @@ def test_published_catalog_binds_all_runtime_providers(monkeypatch):
         release_path=ROOT / 'docs/governance/capability-catalog-release.json',
     )
     assert service is not None
+    release = load_catalog_release((ROOT / 'docs/governance/capability-catalog-release.json').read_text(encoding='utf-8'))
+    store = InMemoryCatalogStore()
+    store.publish(release)
+    resolver = CatalogResolver(store, registry)
+    for descriptor in release.descriptors:
+        resolver.resolve(release.release_id, descriptor.id, descriptor.major_version)
+    assert {(item.id, item.major_version) for item in release.descriptors} == set(registry.keys())
 
 
 def test_container_build_checks_provider_artifacts_before_runtime():

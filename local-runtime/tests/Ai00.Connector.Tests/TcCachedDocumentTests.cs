@@ -7,6 +7,61 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public sealed class TcCachedDocumentTests
 {
+    [Fact]
+    public async Task Rejection_after_native_container_open_is_never_a_no_effect_proof()
+    {
+        var folder=Path.Combine(Path.GetTempPath(),"tc-native-rejection-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);
+        try {
+            using var sta=new StaDispatcher();var app=CacheEnvironmentDocumentTests.Application();
+            var factory=app.DocumentFactory!;
+            app.DocumentFactory=path=>{var document=factory(path);document.InsertDocument(Path.Combine(folder,"foreign.jt"));return document;};
+            using var runtime=new TeamcenterReadOnlyRuntime(new TeamcenterModelFileTests.Worker(),Path.Combine(folder,"tc.db"));
+            await runtime.LoginAsync("tc-production","test","test",default);
+            var adapter=new VisMockupAdapter(sta,new AllowedPathPolicy([Path.Combine(folder,"artifacts")]),new FakeVisMockupCom{ExistingApplication=app,ProcessId=123,ProcessStartUtcTicks=456},Path.Combine(folder,"captures"),Path.Combine(folder,"tree.db"),runtime);
+            var packet=JsonNode.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Fixtures","tc-local-open.json")))![0]!;
+            var error=await Assert.ThrowsAsync<ConnectorException>(()=>adapter.ExecuteAsync(new("vismockup.model.open@3",JsonSerializer.SerializeToElement(packet)),default));
+            Assert.Equal("cache_environment_structure_changed",error.Code);
+            Assert.Single(app.OpenDocuments);Assert.Equal(1,app.OpenCalls);
+        } finally {Directory.Delete(folder,true);}
+    }
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Materialization_cancellation_never_opens_native_document_and_requires_worker_cleanup(bool cleanupFails)
+    {
+        var folder=Path.Combine(Path.GetTempPath(),"tc-cancel-open-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);
+        var started=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);var cleaned=false;string? partial=null;
+        try {
+            using var sta=new StaDispatcher();var app=CacheEnvironmentDocumentTests.Application();
+            var worker=new TeamcenterModelFileTests.Worker{CacheFile=async (payload,ct)=>{
+                var input=JsonSerializer.SerializeToElement(payload);partial=Path.Combine(input.GetProperty("output_root").GetString()!,"download.partial");
+                await File.WriteAllBytesAsync(partial,new byte[32]);started.SetResult();
+                try{await Task.Delay(Timeout.Infinite,ct);throw new InvalidOperationException();}
+                catch(OperationCanceledException){
+                    File.Delete(partial);cleaned=true;
+                    if(cleanupFails)throw new ConnectorException("teamcenter_worker_cleanup_failed");
+                    throw;
+                }
+            }};
+            using var runtime=new TeamcenterReadOnlyRuntime(worker,Path.Combine(folder,"tc.db"));
+            await runtime.LoginAsync("tc-production","test","test",default);
+            var adapter=new VisMockupAdapter(sta,new AllowedPathPolicy([Path.Combine(folder,"artifacts")]),new FakeVisMockupCom{ExistingApplication=app,ProcessId=123,ProcessStartUtcTicks=456},Path.Combine(folder,"captures"),Path.Combine(folder,"tree.db"),runtime);
+            var packet=JsonNode.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"Fixtures","tc-local-open.json")))![0]!;
+            using var cancellation=new CancellationTokenSource();
+            var opening=adapter.ExecuteAsync(new("vismockup.model.open@3",JsonSerializer.SerializeToElement(packet)),cancellation.Token);
+            await Task.WhenAny(started.Task,opening).WaitAsync(TimeSpan.FromSeconds(5));
+            if(opening.IsCompleted)await opening;
+            cancellation.Cancel();
+            if(cleanupFails){
+                var error=await Assert.ThrowsAsync<ConnectorException>(()=>opening);
+                Assert.Equal("teamcenter_worker_cleanup_failed",error.Code);
+            }else{
+                var error=await Assert.ThrowsAsync<ConnectorNoEffectException>(()=>opening);
+                Assert.Equal("cancelled",error.Code);
+            }
+            Assert.True(cleaned);Assert.False(File.Exists(partial));Assert.Empty(app.OpenDocuments);
+        } finally {Directory.Delete(folder,true);}
+    }
     [Theory]
     [InlineData(8 * 1024 * 1024, true, false)]
     [InlineData(40 * 1024 * 1024, true, false)]

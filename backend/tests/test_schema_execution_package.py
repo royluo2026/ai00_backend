@@ -31,6 +31,21 @@ def _safe_diff(expected):
     ), ())
 
 
+def test_missing_table_sql_preserves_generated_expression_and_storage(tmp_path):
+    expression = "CASE WHEN deleted_at IS NULL THEN 1 ELSE NULL END"
+    table = TableSpec("workmanship_device_assets", "device", "device", False, columns=(
+        ColumnSpec("deleted_at", "DATETIME(6)", True),
+        ColumnSpec("active_slot", "TINYINT", True, extra="STORED GENERATED", generation_expression=expression),
+    ))
+    expected = ExpectedSchema((table,))
+    diff = SchemaDiff(expected.database_name, expected.schema_sha256, (
+        SchemaDifference("missing_table", table.name, expected_object=table),), ())
+    build_execution_package(expected=expected, diff=diff, output=tmp_path)
+    sql = (tmp_path / "10-create-missing-tables.sql").read_text()
+    assert f"`active_slot` TINYINT GENERATED ALWAYS AS ({expression}) STORED NULL" in sql
+    assert "STORED GENERATED" not in sql
+
+
 def test_execution_package_contains_only_allowlisted_files(tmp_path):
     expected = _expected()
     build_execution_package(expected=expected, diff=_safe_diff(expected), output=tmp_path)

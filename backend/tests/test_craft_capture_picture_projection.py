@@ -86,6 +86,19 @@ def test_attach_writes_the_exact_process_and_version_with_a_renderable_reference
     assert result["operation_id"] == "process"
     assert connection.committed
 
+def test_batch_preserves_existing_pictures_and_checks_revision_under_version_lock(monkeypatch):
+    import pytest
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    cursor=Cursor(one=[{'gid':'version','revision':7},{'gid':'process','process_flow_pic':'["manual.png"]'},None])
+    connection=Connection(cursor);monkeypatch.setattr(process_screenshot,'get_craft_conn',connection_factory(connection))
+    rows=process_screenshot.ProcessScreenshotRepository().attach_many(bop_version_gid='version',capture_run_id='run',expected_revision=7,items=[{'operation_id':'process','artifact_ref':ARTIFACT}],actor_gid='user')
+    pictures=json.loads(cursor.calls[-1][1][0]);assert pictures[0]['url']=='manual.png';assert reference(pictures[1])==ARTIFACT;assert len(rows)==1 and connection.committed
+    cursor=Cursor(one=[{'gid':'version','revision':8}]);connection=Connection(cursor);rolled=[];connection.rollback=lambda:rolled.append(True)
+    monkeypatch.setattr(process_screenshot,'get_craft_conn',connection_factory(connection))
+    with pytest.raises(CapabilityBusinessError,match='BOP changed'):
+        process_screenshot.ProcessScreenshotRepository().attach_many(bop_version_gid='version',capture_run_id='run',expected_revision=7,items=[{'operation_id':'process','artifact_ref':ARTIFACT}],actor_gid='user')
+    assert rolled and not connection.committed and len(cursor.calls)==1
+
 
 def test_line_picture_read_includes_processes_without_direct_part_links(monkeypatch):
     cursor = Cursor(rows=[{

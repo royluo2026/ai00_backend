@@ -132,6 +132,22 @@ _DOMAIN_ERRORS = (
     ),
 )
 
+_COLLECTION_ERRORS = {
+    'knowledge.source.pull': (
+        DomainErrorContract(code='knowledge_source_limit_exceeded', meaning='Source conversion exceeds the bounded block, anchor, depth or diagnostic limit.'),
+        DomainErrorContract(code='knowledge_source_cycle', meaning='Source blocks contain a cycle; no complete snapshot was produced.'),
+    ),
+    'knowledge.source.snapshot.get': (
+        DomainErrorContract(code='knowledge_source_limit_exceeded', meaning='Stored snapshot exceeds the bounded anchor, depth or diagnostic limit.'),
+    ),
+    'knowledge.source.catalog.sync': (
+        DomainErrorContract(code='knowledge_catalog_limit_exceeded', meaning='Source catalog exceeds the complete synchronization record limit.'),
+    ),
+    'knowledge.source.import.preview': (
+        DomainErrorContract(code='knowledge_source_conflict_limit_exceeded', meaning='Merge conflicts exceed the bounded preview limit; no conflicts were hidden.'),
+    ),
+}
+
 
 def _business_definition(spec, *, is_write: bool) -> dict[str, object]:
     operation = (
@@ -214,7 +230,7 @@ def descriptor_for(spec):
             spec.id.startswith("knowledge.document.")
             or spec.id == "knowledge.resource_model_mapping.resolve"
         ) else "optional",
-        "domain_errors": _DOMAIN_ERRORS,
+        "domain_errors": _DOMAIN_ERRORS + _COLLECTION_ERRORS.get(spec.id, ()),
         "domain_errors_complete": True,
         "deprecation_message": (
             f"Use {spec.replaced_by}." if deprecated and spec.replaced_by else None

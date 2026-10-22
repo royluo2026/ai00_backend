@@ -1,0 +1,450 @@
+{
+  "schema_version": 1,
+  "purpose": "本地缓存架构大改造前存储",
+  "date": "2026-10-22",
+  "repository_role": "backend",
+  "branch": "test",
+  "parent_commit": "1bcd745aadef4a0c6a0e2531c46637dd03d5007f",
+  "guide_sha256": "0548492cf3bcbb5326716c14a9be9a8327e48fed0e9b585b1b1ec87b020249b5",
+  "files": [
+    {
+      "path": "backend/base/contracts.py",
+      "bytes": 15409,
+      "sha256": "1eb902e235d2dafd4a286b1c78eba84a5233d5d67fd6e310f98eb7c08b49e919"
+    },
+    {
+      "path": "backend/capability_v2/gateway.py",
+      "bytes": 60302,
+      "sha256": "a0a49088c04b62f9bc4248494663d3cc96b8d33c19434819614fcda284751526"
+    },
+    {
+      "path": "backend/capability_v2/official_domains.json",
+      "bytes": 12852,
+      "sha256": "e1c63f67c24e99f37948f7b4623ecc23f7bf454422998bb20bc680de16060ada"
+    },
+    {
+      "path": "backend/capability_v2/schema_compiler.py",
+      "bytes": 20889,
+      "sha256": "be9f4da325223c514a4e1c51feea729d0279719fb0393ff32a64fb8f26359f00"
+    },
+    {
+      "path": "backend/capability_v2/schema_diff.py",
+      "bytes": 12477,
+      "sha256": "5ed8f98f781d577a75084ce0f4f618945df30939fcbb9c3d7828cb7578abfa0d"
+    },
+    {
+      "path": "backend/capability_v2/schema_model.py",
+      "bytes": 5785,
+      "sha256": "2db16e4bdbbc9850f0a57625bac6c6bb1aa5bdc3d524ecf5a3f268006a87ca0b"
+    },
+    {
+      "path": "backend/capability_v2/schema_sql.py",
+      "bytes": 10885,
+      "sha256": "7a144847743ada5cdba7ba23458bdfcb1ea8dc62eb500ed4114a0ff8e032d415"
+    },
+    {
+      "path": "backend/contracts/connector_execution_plan_v2.py",
+      "bytes": 17360,
+      "sha256": "6260810a35a98113e9c647a9a40bf4d45f649966cb85d77db8642472395921d3"
+    },
+    {
+      "path": "backend/domain_ports/simulation_runtime.py",
+      "bytes": 12741,
+      "sha256": "ec7b5889583f038849ce33540eddc0425f652aa82d83f0af984a88cdc03d0a31"
+    },
+    {
+      "path": "backend/governance/domain_table_ownership.json",
+      "bytes": 65721,
+      "sha256": "d1f4ddfb8a58fbb0159e1933a373caa4e3b55cf30bf6759849bb845cf6391507"
+    },
+    {
+      "path": "backend/governance/schema/expected-schema.json",
+      "bytes": 1627819,
+      "sha256": "70fa41ca10c76a056ca5ac1ef3a24781d0942b5d012addec8242a6ddd5688a0c"
+    },
+    {
+      "path": "backend/governance/schema/schema-build-summary.json",
+      "bytes": 390,
+      "sha256": "d78e5100b7e3f2ea6956ca4fdd024f22661b8330b88dc80a65ee9553d400cb05"
+    },
+    {
+      "path": "backend/governance/schema/schema-source-map.json",
+      "bytes": 659928,
+      "sha256": "629733dbc9a369798c421fe50d1d7f1eb5b3b0fee532fee9c685689016fb185f"
+    },
+    {
+      "path": "backend/governance/table_inventory.json",
+      "bytes": 54042,
+      "sha256": "272c737e2f4b07d5136bc628196f6976be8ae2ba575cd148a96c3635fecaedef"
+    },
+    {
+      "path": "backend/routers/simulation_connector.py",
+      "bytes": 36392,
+      "sha256": "f9e6e4e7966c07d406217928e05160f8bb7ad4b0903b6b5252a52109a61e201d"
+    },
+    {
+      "path": "backend/scripts/run_capability_governance_scan.py",
+      "bytes": 7170,
+      "sha256": "589c17cceba18b8437e64847142c28642d33fd52857e7c8dbd355d51b8465da4"
+    },
+    {
+      "path": "backend/tests/test_capability_catalog_release.py",
+      "bytes": 24544,
+      "sha256": "5c1dc2591c902232079ecbd809e859f8afd092941b4ee28b7a51f8899cd8519f"
+    },
+    {
+      "path": "backend/tests/test_connector_execution_budget.py",
+      "bytes": 9265,
+      "sha256": "5ceee025ab67b368de9b6879f6b04743fb1d241a5869b7b8388613862e0b4cb7"
+    },
+    {
+      "path": "backend/tests/test_connector_runtime_control_plane.py",
+      "bytes": 41890,
+      "sha256": "3c10d9cf7a3bf1b547269a4eb3a70cf76acffd9eb19ecb14d1e3d3f5b85d40e6"
+    },
+    {
+      "path": "backend/tests/test_craft_capture_picture_projection.py",
+      "bytes": 5192,
+      "sha256": "64362146c46c015c1a211b86730b4a6637b53de9c3255e5fa565e20cdaf94623"
+    },
+    {
+      "path": "backend/tests/test_craft_process_screenshot_boundary.py",
+      "bytes": 6986,
+      "sha256": "7e62cfca058bdc5dd9a0b445864231c72ef6c9da4167d2e207cf2e9b648b6402"
+    },
+    {
+      "path": "backend/tests/test_empty_read_evidence.py",
+      "bytes": 3434,
+      "sha256": "dd82ec9b23834a36ac22b03c2890fe45ebeef7f4b304c8aa8ec0fee04f28a5a5"
+    },
+    {
+      "path": "backend/tests/test_gateway_async_db_stages.py",
+      "bytes": 8371,
+      "sha256": "e21259634cf57937d9b49f7e88b16ab46346f1f60669b5b2948e28f83de70430"
+    },
+    {
+      "path": "backend/tests/test_knowledge_collection_boundaries.py",
+      "bytes": 7182,
+      "sha256": "ff4dce54913da39340886b7221fdf7f0f72947713d57cd8e858a164a57626797"
+    },
+    {
+      "path": "backend/tests/test_published_provider_artifacts.py",
+      "bytes": 2387,
+      "sha256": "2517cb35acb2b2dfd38594392c7bcdda4b0ec8abfc4b05b8308034d4860f5e1e"
+    },
+    {
+      "path": "backend/tests/test_registered_domain_schema_tables.py",
+      "bytes": 1484,
+      "sha256": "00ed6fc1d0e739a46eba9c4f10b62d8924a69a076fd41bd2634be064c7a237cf"
+    },
+    {
+      "path": "backend/tests/test_release_collection_boundaries.py",
+      "bytes": 3749,
+      "sha256": "cb51dde525050090b6e549d024675a38cd87e6b6a89881ac675dd640c7220527"
+    },
+    {
+      "path": "backend/tests/test_schema_compiler.py",
+      "bytes": 17740,
+      "sha256": "bc71ea62cc1a4bbf44820bd8ff0366fdd665ae881cf8624d95793ae25292cf82"
+    },
+    {
+      "path": "backend/tests/test_schema_execution_package.py",
+      "bytes": 7766,
+      "sha256": "c80fab4ef5857843a037c038961280ec1e3ceb74915382e5eef80e2d532573f0"
+    },
+    {
+      "path": "backend/tests/test_schema_snapshot_diff.py",
+      "bytes": 9317,
+      "sha256": "cc67f4f99cbd3c86053fe1edf3df074f5260512179e1f16a696c6da0cbebbac7"
+    },
+    {
+      "path": "backend/tests/test_simulation_capture_workflow.py",
+      "bytes": 33907,
+      "sha256": "c0ad7557f9e27f20cbab74b236e6d397ba1224d02052afbfaa547f906f04b7b2"
+    },
+    {
+      "path": "backend/tests/test_simulation_connector_runtime_v2_sql.py",
+      "bytes": 86964,
+      "sha256": "c74ff26015001bc75ade9688abb2c8d9c7c73e3547d7bbe4c5f1e85c4ba615e0"
+    },
+    {
+      "path": "backend/tests/test_simulation_environment_composition_capabilities.py",
+      "bytes": 12785,
+      "sha256": "7a2593311d95759f589cf9364cfc4eb49b4bdf90cece57f26a76ea440d5d3ca9"
+    },
+    {
+      "path": "backend/tests/test_simulation_governed_domain_client.py",
+      "bytes": 9268,
+      "sha256": "44046c8fd752f543e962d86e552fe1eae32bc06539bc63627068cb8707bf66ea"
+    },
+    {
+      "path": "backend/tests/test_simulation_reproducibility.py",
+      "bytes": 23509,
+      "sha256": "d8f3e001227f8090702e6dbe32a7edebebd51b5a079d16cdf4a9bdd1f7b3511d"
+    },
+    {
+      "path": "docs/architecture/green-local-cache/README.md",
+      "bytes": 14482,
+      "sha256": "0548492cf3bcbb5326716c14a9be9a8327e48fed0e9b585b1b1ec87b020249b5"
+    },
+    {
+      "path": "docs/governance/capability-catalog-lineage.json",
+      "bytes": 13408973,
+      "sha256": "28a8f6eadbac5acfb804d1fe7339250121031ac419ccb7a2abb974486ffb25b8"
+    },
+    {
+      "path": "docs/governance/capability-catalog-release.json",
+      "bytes": 20440436,
+      "sha256": "36f78aff96ba3bc97809ebe3c7776dd70926f32fcd33ddc836ba89bbbc0d0176"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/CapturePixels.cs",
+      "bytes": 5216,
+      "sha256": "43eb9024bd14445765d6661fcb683c35bf299b6c257f6a8912bfd3b050b39903"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/TcCachedDocument.cs",
+      "bytes": 11137,
+      "sha256": "11d81ff27d39db4eacfc74cacc7827111d0a7f0a7013e3c9d48214e2497266e8"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/TeamcenterReadOnlySession.cs",
+      "bytes": 11442,
+      "sha256": "4bda82133c1b833918dc9450ceab13c0b1e3be8c20a901ce0713d165e44ba11c"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.AppHost/AppCaptureUploader.cs",
+      "bytes": 5891,
+      "sha256": "d9955a09ca96a480237665c464310eff49bb4f89de164b2945160e530a554b31"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.AppHost/AppHostOptions.cs",
+      "bytes": 10570,
+      "sha256": "be19acde826618ae1dca2734d8a23395281afac1f377678d34e51dd28b885bd3"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.AppHost/CaptureDeliveryQueue.cs",
+      "bytes": 11942,
+      "sha256": "9a74b1653c281d935c07917b23f429a43585e5eab44d83db1e50c761e2f89680"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.AppHost/PlanExecutionWorker.cs",
+      "bytes": 23767,
+      "sha256": "4d8d6086cb3335e19be4aacd731ad42406f3718dee87fb81f3474a90071fa9b1"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.AppHost/Program.cs",
+      "bytes": 8307,
+      "sha256": "206272fb62aab34a82a24bca1a1ec7f3804dbfd6d7c1efd560db386283410b34"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.AppHost/RuntimeSessionWorker.cs",
+      "bytes": 35386,
+      "sha256": "778b1905281023aa2555484d27cd8b41b90d8570e033c7bc0208f8116da5d89a"
+    },
+    {
+      "path": "local-runtime/tests/Ai00.Connector.Tests/AppHostLifecycleTests.cs",
+      "bytes": 21801,
+      "sha256": "41d440f65407fc1d15b5c5e4c83e7bd35095abb28d3cc97560f08500c4b82540"
+    },
+    {
+      "path": "local-runtime/tests/Ai00.Connector.Tests/CaptureDeliveryQueueTests.cs",
+      "bytes": 6475,
+      "sha256": "677f2c4b9c52c04a367a1ad2d35c28dd07919ad4ca6ad6acbd44728f9458aad3"
+    },
+    {
+      "path": "local-runtime/tests/Ai00.Connector.Tests/ExecutionDeliveryBudgetTests.cs",
+      "bytes": 2652,
+      "sha256": "9ee8bae643c42b58174f1b7065133e6a34d7c40d0506a86ac685f7b8095a2f1f"
+    },
+    {
+      "path": "local-runtime/tests/Ai00.Connector.Tests/LocalOpenCancellationTests.cs",
+      "bytes": 7544,
+      "sha256": "b17437677fcdb94c21af2894b771aac6e1be572cebf52abb3248264c90d7aa67"
+    },
+    {
+      "path": "local-runtime/tests/Ai00.Connector.Tests/ReverseCaptureRendererTests.cs",
+      "bytes": 15147,
+      "sha256": "d9849df6f7c36c6c6102661a15be951cf1b09da94cb6ac673085b986b31e05a9"
+    },
+    {
+      "path": "local-runtime/tests/Ai00.Connector.Tests/TcCachedDocumentTests.cs",
+      "bytes": 9410,
+      "sha256": "e8897a86f87eba0f43645dd98394e92e81b3860ee8a22a339b2c62de5ed07864"
+    },
+    {
+      "path": "local-runtime/tests/Ai00.Connector.Tests/TeamcenterModelFileTests.cs",
+      "bytes": 6474,
+      "sha256": "268fe68a3ae0b3ecd76f81df3da09c200d45c3c9c412c689a3c066b41072c95b"
+    },
+    {
+      "path": "local-runtime/tests/Ai00.Connector.Tests/TeamcenterReadOnlyRuntimeTests.cs",
+      "bytes": 16394,
+      "sha256": "178537639f468efecff2be1cee7c8b8b59be356f06f0bc315fc88a1d60432e90"
+    },
+    {
+      "path": "local-runtime/tests/Ai00.Connector.Tests/TeamcenterReadOnlySessionTests.cs",
+      "bytes": 6590,
+      "sha256": "b34416eeb14160d556560acc88ef2eeee04c12d18097f1727a0a4ead2a14566e"
+    },
+    {
+      "path": "plugins/agent/agent_backend/orchestration/workspace_model.py",
+      "bytes": 13291,
+      "sha256": "bbf71765d601cb4e57f949b8ac95c45068473e19d53c2350654944d80244c40a"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/contracts.py",
+      "bytes": 79755,
+      "sha256": "d04c39ca01d26196ad939621e2d671da30ad773b8ed51829f434817ceaf8c933"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/process_screenshot.py",
+      "bytes": 9494,
+      "sha256": "25281a14b833bd6efea973bc42cfa81d83e66e29f9ac1ae4df68f14fb4e1cdd1"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/provider.py",
+      "bytes": 43749,
+      "sha256": "0e653c88d7e02e23d4b16c8ac96aab30cd8627016a6f04644bc0deaa1a6ee7e2"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/capabilities/feishu_catalog_next.py",
+      "bytes": 18042,
+      "sha256": "1f463131613ae5a14293ea603762f62f5948ede37a33e22c1778c85337410a77"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/capabilities/feishu_import_next.py",
+      "bytes": 20137,
+      "sha256": "04cceab78f1628fd6e7343739dc73cdd1188f0b78618c7f68eeedecfb3f24b61"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/capabilities/feishu_source_next.py",
+      "bytes": 18285,
+      "sha256": "7c5b8b59ebb37417fa20c29b98cef1a216bcdff51c5f597b9120aaedea26cee6"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/capabilities/knowledge_documents_next.py",
+      "bytes": 49600,
+      "sha256": "62d0384c310c23bc1062ded8088f098da808e54931e2cc31c02be7dc02134b98"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/feishu_markdown.py",
+      "bytes": 11230,
+      "sha256": "ded0fdf6c1e74865f5e7098e5a59d4473c523379ed2fc51466f8eaefb6aa0704"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/provider.py",
+      "bytes": 12756,
+      "sha256": "06494eedf33553863870544ee51efdf946ffba601272e0ff6a7915f3d81659b3"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/source_merge.py",
+      "bytes": 2969,
+      "sha256": "e79b81da33b12fe29957383a9541a41aea4845f5ba3af18781f8c56fbd033c1c"
+    },
+    {
+      "path": "plugins/ontology/ontology_backend/capabilities/ontology_proposals_next.py",
+      "bytes": 16587,
+      "sha256": "7596bd92aacdae99a8efeb4fca44e67899c2b59db6f67b063cafa4779fff3c8a"
+    },
+    {
+      "path": "plugins/ontology/ontology_backend/capabilities/ontology_releases_next.py",
+      "bytes": 18632,
+      "sha256": "17e7d5144f13e375c5cb31c59f8b36f818ff94749107abc24eb7956fbbd64053"
+    },
+    {
+      "path": "plugins/ontology/ontology_backend/proposals.py",
+      "bytes": 15245,
+      "sha256": "bbbd0556ed4be61422381748b2422629f5f98440f01671730bdf5d6f05d07a86"
+    },
+    {
+      "path": "plugins/ontology/ontology_backend/provider.py",
+      "bytes": 6504,
+      "sha256": "de3a9fa1cc54d502a68fd10fc291e4cc8f7008c64149c4ff2b1ac19d970af6eb"
+    },
+    {
+      "path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+      "bytes": 22981,
+      "sha256": "ce0bb483b0544604c5df07781d40dbf6de625c3676546092705589b519e4d121"
+    },
+    {
+      "path": "plugins/project_management/tests/test_project_atomic_crud_contracts.py",
+      "bytes": 3167,
+      "sha256": "13acfc406095464d1414f41f40faef20199095b15788f2afe01b406710c856c7"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/capture_worker.py",
+      "bytes": 29167,
+      "sha256": "14b94542d93f91e952412afbe2ac667b4411007574de820ab0a2fc09e1e8378b"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/connector_plans.py",
+      "bytes": 9452,
+      "sha256": "437a4782bd44bbbcd05ca69797ba4fd738a24c227dce87e4f873f35dd915da72"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/connector_runtime_sessions.py",
+      "bytes": 8096,
+      "sha256": "57a317dd9d0c2966bd7811bf940a6a1a47f31f58703539264d279ba447b089bc"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/capture_runs.py",
+      "bytes": 21721,
+      "sha256": "8bf3cfb3808e002cf5244ab745a2b215516d0dda01b4c146a8cf67bdd387df75"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/connector_contracts.py",
+      "bytes": 41927,
+      "sha256": "ec8a9e00a38b881d00f678aff1ae8e2a1fd805021df8c32778e732bdac2834c7"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/connector_outcomes.py",
+      "bytes": 6763,
+      "sha256": "3a27c6841e848a27e56cbcbf46fb3504330d332d9e6932c23f1b9bbdd488aed3"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/contracts.py",
+      "bytes": 29242,
+      "sha256": "540ec2b6b7aaa6294360dcfff4f7dc09d80b89aef1aaa0fb3390dc355e89b60b"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/environment_composition.py",
+      "bytes": 16422,
+      "sha256": "53d6b20f0faedf00f2e122e2d0f09e3caa9d861cc05dcdbc19aea19fe68ddc7d"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/models.py",
+      "bytes": 31364,
+      "sha256": "bc30f0d31f2ffbf47ab909776acabc10f0806beadd3da5c593d29c6b453ece3e"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/data/connector_repository.py",
+      "bytes": 119302,
+      "sha256": "6e8f4a4e0890bd41d97a62208ea79218088d32c197e26672084303c4211ca8c3"
+    }
+  ],
+  "excluded_local_files": [
+    {
+      "path": "backend/.env.production.template",
+      "reason": "Contains live deployment credentials; kept locally and not staged."
+    },
+    {
+      "path": "backend/.env.test.template",
+      "reason": "Contains live deployment credentials; kept locally and not staged."
+    }
+  ],
+  "verification": {
+    "diff_check": "passed",
+    "changed_python_json_parse": "passed",
+    "targeted_frontend_tests": null,
+    "targeted_backend_tests": 36,
+    "full_suite": "not_run",
+    "native_runtime": "not_run",
+    "release_approval": "not_claimed"
+  },
+  "scope_notes": [
+    "Source snapshot, not installer or production deployment.",
+    "Ignored model caches, login state, build outputs and external resource packs are not uploaded.",
+    "The manifest describes changed source files relative to parent_commit; it does not describe the complete Git tree."
+  ]
+}

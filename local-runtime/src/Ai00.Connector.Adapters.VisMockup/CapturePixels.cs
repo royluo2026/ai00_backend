@@ -47,6 +47,7 @@ internal sealed record CapturePixels(int Width, int Height, byte[] Bgr)
     {
         var foreground = 0;
         var colored = 0;
+        var cornerOverlay = 0;
         var left = Width;
         var right = 0;
         var top = Height;
@@ -61,13 +62,20 @@ internal sealed record CapturePixels(int Width, int Height, byte[] Bgr)
             if (Math.Max(Math.Abs(blue - Bgr[0]), Math.Max(Math.Abs(green - Bgr[1]), Math.Abs(red - Bgr[2]))) < 20)
                 continue;
             foreground++;
-            if (Math.Max(red, Math.Max(green, blue)) - Math.Min(red, Math.Min(green, blue)) > 25) colored++;
+            if (Math.Max(red, Math.Max(green, blue)) - Math.Min(red, Math.Min(green, blue)) > 25)
+            {
+                colored++;
+                // Native capture includes the coordinate triad. Exempt only a
+                // small bottom-left annotation budget, never a large colored part.
+                if (column < Width / 5 && row >= Height * 3 / 4) cornerOverlay++;
+            }
             left = Math.Min(left, column); right = Math.Max(right, column);
             top = Math.Min(top, row); bottom = Math.Max(bottom, row);
         }
         if (foreground < 5000 || Math.Max((right - left + 1.0) / Width, (bottom - top + 1.0) / Height) < .15)
             throw new ConnectorException("capture_empty_or_clipped_scene");
-        if (colored > Math.Max(300, foreground / 50))
+        var annotation = cornerOverlay <= Width * Height / 1000 ? cornerOverlay : 0;
+        if (colored - annotation > Math.Max(300, foreground / 50))
             throw new ConnectorException("capture_gray_baseline_invalid");
     }
 

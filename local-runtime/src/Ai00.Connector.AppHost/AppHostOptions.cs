@@ -9,20 +9,27 @@ using Ai00.Connector.Contracts.V2;
 
 namespace Ai00.Connector.AppHost;
 
-public sealed record AppHostOptions(int ParentPid, string PipeName, string LaunchNonce, string ManifestPath, Uri GatewayOrigin, bool Development)
+public sealed record AppHostOptions(int ParentPid, string PipeName, string LaunchNonce, string ManifestPath, Uri GatewayOrigin, bool Development, string? StateDirectory=null)
 {
     public static AppHostOptions Parse(string[] args)
     {
         string[] names=["--parent-pid","--pipe-name","--launch-nonce","--manifest-path","--gateway-origin"];
         var development=false;
 #if DEBUG
-        if(args.Length==12&&args[^2]=="--development"&&args[^1]=="local")
+        if(args.Length is 12 or 14&&args[^2]=="--development"&&args[^1]=="local")
         {
             development=true;
             args=args[..^2];
         }
 #endif
         var values=new Dictionary<string,string>(StringComparer.Ordinal);
+        string? stateDirectory=null;
+        if(args.Length==12&&args[^2]=="--state-root")
+        {
+            stateDirectory=args[^1];args=args[..^2];
+            if(!Path.IsPathFullyQualified(stateDirectory)||stateDirectory.StartsWith("\\\\")||Path.GetFullPath(stateDirectory)==Path.GetPathRoot(stateDirectory))throw new InvalidDataException("state_root_invalid");
+            stateDirectory=Path.GetFullPath(stateDirectory);
+        }
         if(args.Length!=10)throw new InvalidDataException("startup_arguments_invalid");
         for(var i=0;i<args.Length;i+=2)
             if(!names.Contains(args[i]) || !values.TryAdd(args[i],args[i+1]))throw new InvalidDataException("startup_arguments_invalid");
@@ -34,7 +41,9 @@ public sealed record AppHostOptions(int ParentPid, string PipeName, string Launc
         var productionOrigin=origin.Scheme=="https"&&!origin.IsLoopback;
         var developmentOrigin=development&&origin.Scheme=="http"&&origin.IsLoopback;
         if((!productionOrigin&&!developmentOrigin)||origin.AbsolutePath!="/"||origin.UserInfo!=""||origin.Query!=""||origin.Fragment!="")throw new InvalidDataException("gateway_origin_invalid");
-        return new(pid,values[names[1]],values[names[2]],Path.GetFullPath(values[names[3]]),origin,development);
+        var manifestPath=Path.GetFullPath(values[names[3]]);
+        if(development&&stateDirectory is not null&&!stateDirectory.StartsWith(Path.GetDirectoryName(manifestPath)+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("state_root_outside_deployment");
+        return new(pid,values[names[1]],values[names[2]],manifestPath,origin,development,stateDirectory);
     }
 }
 

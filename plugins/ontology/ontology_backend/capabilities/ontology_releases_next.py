@@ -53,7 +53,7 @@ RELEASE_SEARCH_SCHEMA = {
     "type": "object",
     "required": ["items", "total"],
     "properties": {
-        "items": {"type": "array", "items": RELEASE_SCHEMA},
+        "items": {"type": "array", "maxItems": 100, "items": RELEASE_SCHEMA},
         "total": {"type": "integer", "minimum": 0},
     },
 }

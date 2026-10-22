@@ -81,6 +81,21 @@ class ScreenshotRepository:
 def context():
     return CapabilityContext(user_gid="user-1", team_gid="team-1")
 
+def test_batch_verifies_every_exact_artifact_before_one_repository_transaction():
+    class BatchRepository:
+        def __init__(self):self.calls=[]
+        def attach_many(self,**values):self.calls.append(values);return [{'screenshot_gid':'shot','bop_version_gid':values['bop_version_gid'],'capture_run_id':values['capture_run_id'],**item} for item in values['items']]
+    repository=BatchRepository();calls=[]
+    def verify(ref,*args,**kwargs):calls.append(ref['artifact_id']);return ref
+    provider=ProcessScreenshotProvider(repository,verify)
+    values={'bop_version_gid':'bop-1','capture_run_id':'run-1','expected_revision':7,'items':[{'operation_id':'op-10','artifact_ref':ARTIFACT},{'operation_id':'op-20','artifact_ref':{**ARTIFACT,'artifact_id':'artifact2'}}]}
+    result=provider.attach_batch(values,context())
+    assert len(repository.calls)==1 and len(calls)==2 and len(result.data['items'])==2
+    repository.calls.clear()
+    values['items'][1]['artifact_ref']['media_type']='text/plain'
+    with pytest.raises(CapabilityBusinessError):provider.attach_batch(values,context())
+    assert not repository.calls
+
 
 def payload(artifact=ARTIFACT):
     return {

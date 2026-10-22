@@ -7,6 +7,13 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public sealed class TeamcenterReadOnlySessionTests
 {
+    [Fact] public async Task Worker_exit_deadline_cannot_be_reported_as_confirmed_cleanup()
+    {
+        var pendingExit=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var error=await Assert.ThrowsAsync<ConnectorException>(()=>TeamcenterReadOnlySession.ConfirmWorkerExitAsync(pendingExit.Task,TimeSpan.FromMilliseconds(1)));
+        Assert.Equal("teamcenter_worker_cleanup_failed",error.Code);
+        await TeamcenterReadOnlySession.ConfirmWorkerExitAsync(Task.CompletedTask,TimeSpan.FromMilliseconds(1));
+    }
     private sealed class Harness : IAsyncDisposable
     {
         internal int Starts;

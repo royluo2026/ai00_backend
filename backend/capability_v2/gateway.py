@@ -192,7 +192,7 @@ class CapabilityGatewayService:
                 "Strong writes require a transactional capability provider."
             )
         try:
-            authorization = self._policy.authorize(descriptor, envelope, provider)
+            authorization = await asyncio.to_thread(self._policy.authorize, descriptor, envelope, provider)
         except GatewayPolicyError:
             raise
         except Exception as exc:
@@ -209,7 +209,7 @@ class CapabilityGatewayService:
         if concurrency_error:
             raise GatewayPolicyError(concurrency_error, "Expected resource version is invalid.")
         try:
-            return self._policy.issue_approval(descriptor, envelope, provider, authorization)
+            return await self._run_sync_stage(lambda: self._policy.issue_approval(descriptor, envelope, provider, authorization))
         except GatewayPolicyError:
             raise
         except Exception as exc:
@@ -241,7 +241,7 @@ class CapabilityGatewayService:
             return self._rejected(envelope, "consumer_not_allowed", "Consumer is not exposed to this capability.")
 
         try:
-            authorization = self._policy.authorize(descriptor, envelope, provider)
+            authorization = await asyncio.to_thread(self._policy.authorize, descriptor, envelope, provider)
         except GatewayPolicyError as exc:
             return project_result(
                 self._rejected(envelope, exc.code, exc.message),
@@ -289,7 +289,7 @@ class CapabilityGatewayService:
             )
         if is_write:
             try:
-                replay = self._reliability.replay(envelope)
+                replay = await asyncio.to_thread(self._reliability.replay, envelope)
             except ReliabilityError as exc:
                 return self._rejected(envelope, str(exc), "Reliable invocation was rejected.")
             except Exception:
@@ -312,7 +312,7 @@ class CapabilityGatewayService:
                 )
 
         try:
-            self._policy.approve(descriptor, envelope, provider, authorization)
+            await self._run_sync_stage(lambda: self._policy.approve(descriptor, envelope, provider, authorization))
         except GatewayPolicyError as exc:
             return project_result(
                 self._rejected(envelope, exc.code, exc.message),
@@ -359,11 +359,13 @@ class CapabilityGatewayService:
             lease: InvocationLease | None = None
             if is_write:
                 try:
-                    lease = self._reliability.begin(
-                        envelope,
-                        descriptor,
-                        policy_version=(authorization.policy_version
-                                        if authorization is not None else "unversioned"),
+                    lease = await self._run_sync_stage(
+                        lambda: self._reliability.begin(
+                            envelope, descriptor,
+                            policy_version=(authorization.policy_version
+                                            if authorization is not None else "unversioned"),
+                        ),
+                        on_cancel=lambda value: self._cancel_unstarted_lease(value, envelope),
                     )
                 except ReliabilityError as exc:
                     return self._rejected(envelope, str(exc), "Reliable invocation was rejected.")
@@ -497,12 +499,12 @@ class CapabilityGatewayService:
         except asyncio.CancelledError:
             cancelled = True
             if transaction is not None:
-                self._rollback_and_close(transaction)
+                await self._finish_worker(asyncio.create_task(asyncio.to_thread(self._rollback_and_close, transaction)))
                 transaction = None
             raise
         except CapabilityBusinessError as exc:
             if transaction is not None:
-                self._rollback_and_close(transaction)
+                await self._finish_worker(asyncio.create_task(asyncio.to_thread(self._rollback_and_close, transaction)))
                 transaction = None
             result = self._rejected(
                 envelope,
@@ -513,7 +515,7 @@ class CapabilityGatewayService:
             )
         except Exception:
             if transaction is not None:
-                self._rollback_and_close(transaction)
+                await self._finish_worker(asyncio.create_task(asyncio.to_thread(self._rollback_and_close, transaction)))
                 transaction = None
             _log.exception(
                 "Capability provider failed: %s@%s request_id=%s",
@@ -539,7 +541,7 @@ class CapabilityGatewayService:
                     correlation=CorrelationRef(request_id=envelope.request_id, trace_id=envelope.trace_id),
                 )
         finally:
-            if admission_lease is not None and not defer_stream:
+            if admission_lease is not None and not defer_stream and (lease is None or cancelled):
                 await admission_lease.release()
             if stream_output is not None and not defer_stream:
                 await self._close_stream_iterator(stream_output.iterator)
@@ -602,50 +604,16 @@ class CapabilityGatewayService:
                     )
                 })
             try:
-                self._reliability.complete(
-                    lease,
-                    result,
-                    transaction=transaction,
-                    preserve_projected_data=(descriptor.replay_data_policy == "projected"),
-                )
-                if transaction is not None:
-                    transaction.commit()
-            except Exception:
-                if transaction is not None:
-                    try:
-                        transaction.rollback()
-                    except Exception:
-                        pass
-                unknown = CapabilityResultV2(
-                    ok=False,
-                    status=CapabilityStatus.OUTCOME_UNKNOWN,
-                    capability_id=envelope.capability_id,
-                    major_version=envelope.major_version,
-                    operation_ref=OperationRef(
-                        operation_id=lease.operation_id,
-                        status=OperationStatus.OUTCOME_UNKNOWN,
-                    ),
-                    error=CapabilityErrorV2(
-                        code="outcome_persistence_failed",
-                        message="The provider may have committed, but its durable outcome could not be recorded.",
-                    ),
-                    correlation=CorrelationRef(
-                        request_id=envelope.request_id, trace_id=envelope.trace_id
-                    ),
-                )
-                try:
-                    self._reliability.mark_unknown(lease, unknown)
-                except Exception:
-                    pass
-                return unknown
+                result = await self._finish_worker(asyncio.create_task(asyncio.to_thread(
+                    self._finalize_invocation, lease, result, transaction,
+                    descriptor.replay_data_policy == "projected",
+                )))
             finally:
-                if transaction is not None:
-                    try:
-                        transaction.close()
-                    except Exception:
-                        pass
+                await self._finish_worker(asyncio.create_task(admission_lease.release()))
+            if result.status is CapabilityStatus.OUTCOME_UNKNOWN:
+                return result
         elif transaction is not None:
-            self._rollback_and_close(transaction)
+            await self._finish_worker(asyncio.create_task(asyncio.to_thread(self._rollback_and_close, transaction)))
             return self._failed(
                 envelope, "unexpected_transaction",
                 "A transactional provider requires durable write reliability."
@@ -1075,6 +1043,70 @@ class CapabilityGatewayService:
         if isinstance(current, (dict, list, tuple, set, bool)) or str(current) != expected:
             return "expected_resource_version_mismatch"
         return None
+
+    @staticmethod
+    async def _finish_worker(worker):
+        """Retain ownership until a sync DB unit reports its actual outcome."""
+        while True:
+            try:
+                return await asyncio.shield(worker)
+            except asyncio.CancelledError:
+                if worker.cancelled():
+                    raise
+
+    async def _run_sync_stage(self, callback, *, on_cancel=None):
+        worker = asyncio.create_task(asyncio.to_thread(callback))
+        try:
+            return await asyncio.shield(worker)
+        except asyncio.CancelledError:
+            try:
+                value = await self._finish_worker(worker)
+                if on_cancel is not None:
+                    await self._finish_worker(asyncio.create_task(asyncio.to_thread(on_cancel, value)))
+            except Exception:
+                _log.exception("Cancelled Gateway DB stage cleanup failed")
+            raise
+
+    def _cancel_unstarted_lease(self, lease, envelope):
+        if lease.replay_result is not None:
+            return
+        result = self._failed(envelope, "cancelled_before_dispatch", "Invocation was cancelled before provider dispatch.")
+        self._finalize_invocation(lease, result, None, False)
+
+    def _finalize_invocation(self, lease, result, transaction, preserve_projected_data):
+        # Completion, commit/rollback, unknown-outcome handling and close are one
+        # worker-owned unit. Cancellation cannot leave a live transaction behind.
+        try:
+            self._reliability.complete(lease, result, transaction=transaction,
+                                       preserve_projected_data=preserve_projected_data)
+            if transaction is not None:
+                transaction.commit()
+            return result
+        except Exception:
+            if transaction is not None:
+                try:
+                    transaction.rollback()
+                except Exception:
+                    pass
+            unknown = CapabilityResultV2(
+                ok=False, status=CapabilityStatus.OUTCOME_UNKNOWN,
+                capability_id=result.capability_id, major_version=result.major_version,
+                operation_ref=OperationRef(operation_id=lease.operation_id, status=OperationStatus.OUTCOME_UNKNOWN),
+                error=CapabilityErrorV2(code="outcome_persistence_failed",
+                    message="The provider may have committed, but its durable outcome could not be recorded."),
+                correlation=result.correlation,
+            )
+            try:
+                self._reliability.mark_unknown(lease, unknown)
+            except Exception:
+                pass
+            return unknown
+        finally:
+            if transaction is not None:
+                try:
+                    transaction.close()
+                except Exception:
+                    pass
 
     async def _invoke_sync_provider(self, handler, payload, context, timeout_seconds):
         # Cancelling to_thread cannot stop its worker. Transfer ownership under a

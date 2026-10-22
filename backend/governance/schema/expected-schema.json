@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:c40f1ded41cf807a34a20b83d1e654ca3aed33699aa0962decaa2fbc61006188",
+  "schema_sha256": "sha256:c612bf7650eddcf1002de430b8d60120ab0f37825de1cf89ada59347ec4b029d",
   "schema_version": 1,
   "tables": [
     {
@@ -1682,9 +1682,9 @@
           "default": null,
           "extra": "",
           "name": "project_gid",
-          "nullable": false,
+          "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
           ]
         }
       ],
@@ -1720,7 +1720,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ]
     },
     {
@@ -1880,9 +1881,9 @@
           "default": null,
           "extra": "",
           "name": "project_gid",
-          "nullable": false,
+          "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
           ]
         }
       ],
@@ -1932,7 +1933,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ]
     },
     {
@@ -2092,9 +2094,9 @@
           "default": null,
           "extra": "",
           "name": "project_gid",
-          "nullable": false,
+          "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
           ]
         }
       ],
@@ -2144,7 +2146,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ]
     },
     {
@@ -2274,9 +2277,9 @@
           "default": null,
           "extra": "",
           "name": "project_gid",
-          "nullable": false,
+          "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
           ]
         }
       ],
@@ -2328,7 +2331,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ]
     },
     {
@@ -2448,9 +2452,9 @@
           "default": null,
           "extra": "",
           "name": "project_gid",
-          "nullable": false,
+          "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
           ]
         }
       ],
@@ -2487,7 +2491,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ]
     },
     {
@@ -2577,9 +2582,9 @@
           "default": null,
           "extra": "",
           "name": "project_gid",
-          "nullable": false,
+          "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
           ]
         }
       ],
@@ -2617,7 +2622,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ]
     },
     {
@@ -2727,9 +2733,9 @@
           "default": null,
           "extra": "",
           "name": "project_gid",
-          "nullable": false,
+          "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
           ]
         }
       ],
@@ -2766,7 +2772,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ]
     },
     {
@@ -2962,6 +2969,62 @@
     {
       "columns": [
         {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "panorama_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "panorama_gid"
+          ],
+          "name": "uq_agent_orch_organization_panorama",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_agent_orch_organization_roots",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "sources": [
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "CHAR(36)",
           "default": null,
           "extra": "",
@@ -3046,9 +3109,19 @@
           "default": null,
           "extra": "",
           "name": "project_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'project'",
+          "extra": "",
+          "name": "scope_kind",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
           ]
         }
       ],
@@ -3098,7 +3171,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ]
     },
     {
@@ -3589,9 +3663,9 @@
           "default": null,
           "extra": "",
           "name": "project_gid",
-          "nullable": false,
+          "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+            "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
           ]
         }
       ],
@@ -3628,7 +3702,8 @@
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
-        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
+        "backend/db/migrations/domains/agent/0012_agent_organization_panorama.sql"
       ]
     },
     {
@@ -3893,6 +3968,83 @@
         "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
         "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
         "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "version_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "project_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "definition_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "version_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "project_gid"
+          ],
+          "name": "idx_agent_orch_workspace_scope",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_agent_orch_workspaces",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "sources": [
+        "backend/db/migrations/domains/agent/0013_agent_orchestration_workspace.sql"
       ]
     },
     {
@@ -5708,7 +5860,7 @@
           "default": null,
           "extra": "",
           "name": "data",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030006_base_platform_runtime_tables.sql"
           ]
@@ -7569,6 +7721,18 @@
         },
         {
           "columns": [
+            "project_gid",
+            "role(64)"
+          ],
+          "name": "idx_pm_global",
+          "primary": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
             "project_gid"
           ],
           "name": "idx_pm_project",
@@ -7593,27 +7757,15 @@
         {
           "columns": [
             "project_gid",
-            "role(64)"
-          ],
-          "name": "idx_pm_unique_global",
-          "primary": false,
-          "sources": [
-            "backend/db/mysql_schema.sql"
-          ],
-          "unique": true
-        },
-        {
-          "columns": [
-            "project_gid",
             "role(64)",
             "scope_gid(191)"
           ],
-          "name": "idx_pm_unique_scoped",
+          "name": "idx_pm_scoped",
           "primary": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ],
-          "unique": true
+          "unique": false
         },
         {
           "columns": [
@@ -23401,7 +23553,8 @@
         {
           "data_type": "TINYINT",
           "default": null,
-          "extra": "",
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN `deleted_at` IS NULL THEN 1 ELSE NULL END",
           "name": "active_project_slot",
           "nullable": true,
           "sources": [
@@ -24782,7 +24935,8 @@
         {
           "data_type": "TINYINT",
           "default": null,
-          "extra": "",
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN `deleted_at` IS NULL AND `space_kind`='team' THEN 1 ELSE NULL END",
           "name": "active_team_slot",
           "nullable": true,
           "sources": [
@@ -24792,7 +24946,8 @@
         {
           "data_type": "BIGINT UNSIGNED",
           "default": null,
-          "extra": "",
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN `deleted_at` IS NULL AND `space_kind`='managed_personal' THEN `owner_user_gid` ELSE NULL END",
           "name": "active_personal_owner_gid",
           "nullable": true,
           "sources": [
@@ -30812,6 +30967,199 @@
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
+          "name": "document_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "user_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "base_revision_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "markdown",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "document_gid",
+            "user_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_document_drafts",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "document_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(2)",
+          "default": null,
+          "extra": "",
+          "name": "from_maturity",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(2)",
+          "default": null,
+          "extra": "",
+          "name": "to_maturity",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "changed_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "changed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "document_gid",
+            "changed_at"
+          ],
+          "name": "idx_know_maturity_document",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_document_maturity_events",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
           "name": "gid",
           "nullable": false,
           "sources": [
@@ -30927,6 +31275,36 @@
           "sources": [
             "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(2)",
+          "default": "'V1'",
+          "extra": "",
+          "name": "maturity",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "source_author_open_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "source_author_name",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -30985,7 +31363,9 @@
       "runtime_domain": "knowledge",
       "sources": [
         "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql",
-        "backend/db/migrations/domains/knowledge/0001_knowledge.sql"
+        "backend/db/migrations/domains/knowledge/0001_knowledge.sql",
+        "backend/db/migrations/domains/knowledge/0005_knowledge_workspace_permissions.sql",
+        "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
       ]
     },
     {
@@ -31461,6 +31841,227 @@
     {
       "columns": [
         {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "document_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "revision_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": null,
+          "extra": "",
+          "name": "card_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "title",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "body",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "evidence_text",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "",
+          "name": "evidence_from",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "",
+          "name": "evidence_to",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "evidence_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "target_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": "'draft'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "created_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "updated_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "document_gid",
+            "created_at"
+          ],
+          "name": "idx_know_extraction_document",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "status",
+            "card_type"
+          ],
+          "name": "idx_know_extraction_status",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_extraction_candidates",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0009_extraction_candidates.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(191)",
           "default": null,
           "extra": "",
@@ -31513,6 +32114,943 @@
       "sources": [
         "backend/db/migrations/domains/knowledge/0001_knowledge.sql",
         "backend/db/mysql_schema.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "snapshot_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "source_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "feishu_token",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(1024)",
+          "default": null,
+          "extra": "",
+          "name": "object_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "content_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "byte_size",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "media_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "snapshot_gid"
+          ],
+          "name": "idx_know_feishu_asset_snapshot",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "source_gid",
+            "feishu_token",
+            "content_sha256"
+          ],
+          "name": "uq_know_feishu_asset_identity",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_feishu_assets",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "source_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "snapshot_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "accepted_revision_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "updated_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "source_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_feishu_baselines",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(2048)",
+          "default": null,
+          "extra": "",
+          "name": "source_url",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "app_token",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "table_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "updated_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_feishu_catalog_config",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "record_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "title",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(2048)",
+          "default": null,
+          "extra": "",
+          "name": "document_url",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "document_token",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "source_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "error_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "BOOLEAN",
+          "default": "TRUE",
+          "extra": "",
+          "name": "active",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "active",
+            "updated_at"
+          ],
+          "name": "idx_know_feishu_catalog_status",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "record_id"
+          ],
+          "name": "uq_know_feishu_catalog_record",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_feishu_catalog_records",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "source_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "snapshot_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "request_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "document_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "revision_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "revision_no",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "BOOLEAN",
+          "default": null,
+          "extra": "",
+          "name": "changed",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "created_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "source_gid",
+            "created_at"
+          ],
+          "name": "idx_know_feishu_import_source",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "idempotency_key"
+          ],
+          "name": "uq_know_feishu_import_request",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_feishu_imports",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0008_knowledge_feishu_imports.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "source_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "document_token",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(1024)",
+          "default": null,
+          "extra": "",
+          "name": "object_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "content_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "byte_size",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "anchors_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "diagnostics_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "BOOLEAN",
+          "default": null,
+          "extra": "",
+          "name": "complete",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "created_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "source_author_open_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "source_author_name",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "source_gid",
+            "created_at"
+          ],
+          "name": "idx_know_source_snapshot",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_feishu_snapshots",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0007_knowledge_feishu_snapshots.sql",
+        "backend/db/migrations/domains/knowledge/0010_feishu_original_authors.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "catalog_record_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(2048)",
+          "default": null,
+          "extra": "",
+          "name": "document_url",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "document_token",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "linked_document_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "BOOLEAN",
+          "default": "TRUE",
+          "extra": "",
+          "name": "active",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "catalog_record_gid"
+          ],
+          "name": "idx_know_feishu_source_record",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_know_feishu_sources",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0006_knowledge_feishu_sources.sql"
       ]
     },
     {
@@ -31731,6 +33269,17 @@
         },
         {
           "columns": [
+            "id"
+          ],
+          "name": "id",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0003_display_counters.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
             "item_gid",
             "created_at"
           ],
@@ -31740,17 +33289,6 @@
             "backend/db/migrations/domains/knowledge/0003_display_counters.sql"
           ],
           "unique": false
-        },
-        {
-          "columns": [
-            "id"
-          ],
-          "name": "uq_workmanship_know_item_history_id",
-          "primary": false,
-          "sources": [
-            "backend/db/migrations/domains/knowledge/0003_display_counters.sql"
-          ],
-          "unique": true
         }
       ],
       "legacy_name": true,
@@ -39081,7 +40619,7 @@
           "columns": [
             "token_hash"
           ],
-          "name": "uq_workmanship_runtime_enrollments_token_hash",
+          "name": "token_hash",
           "primary": false,
           "sources": [
             "backend/db/migrations/202608030004_device_control_plane.sql"
@@ -39151,6 +40689,149 @@
       "runtime_domain": "device",
       "sources": [
         "backend/db/migrations/domains/device/0001_device.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "batch_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "",
+          "name": "chunk_index",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+          ]
+        },
+        {
+          "data_type": "MEDIUMTEXT",
+          "default": null,
+          "extra": "",
+          "name": "chunk_text",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "batch_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_workmanship_sim_cache_assembly_preparation_chunks_1",
+          "referenced_columns": [
+            "batch_id"
+          ],
+          "referenced_table": "workmanship_sim_cloud_cache_batches",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "batch_id",
+            "chunk_index"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_cache_assembly_preparation_chunks",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "batch_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "preparation_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "preparation_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "batch_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_workmanship_sim_cache_assembly_preparations_1",
+          "referenced_columns": [
+            "batch_id"
+          ],
+          "referenced_table": "workmanship_sim_cloud_cache_batches",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "batch_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_cache_assembly_preparations",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
       ]
     },
     {
@@ -39694,6 +41375,777 @@
         "backend/db/migrations/domains/simulation/0002_connector_environments.sql",
         "backend/db/migrations/domains/simulation/0004_capture_dispatch_plans.sql",
         "backend/db/migrations/domains/simulation/0006_capture_dispatch_compatibility.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "batch_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "project_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "project_name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "phase",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "display_name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "selector_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "source_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(40)",
+          "default": null,
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(40)",
+          "default": null,
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(40)",
+          "default": null,
+          "extra": "",
+          "name": "completed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": "1",
+          "extra": "",
+          "name": "row_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "node_count",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "fields_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "error_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "trigger_kind",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "request_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "request_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "connector_device_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "principal_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'not_prepared'",
+          "extra": "",
+          "name": "preparation_status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "preparation_error",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "batch_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "project_gid",
+            "created_at"
+          ],
+          "name": "ix_cloud_cache_project",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "status",
+            "updated_at"
+          ],
+          "name": "ix_cloud_cache_worker",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "request_key"
+          ],
+          "name": "uq_cloud_cache_request",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_cloud_cache_batches",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql",
+        "backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "batch_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "manifest_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "batch_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_workmanship_sim_cloud_cache_manifests_1",
+          "referenced_columns": [
+            "batch_id"
+          ],
+          "referenced_table": "workmanship_sim_cloud_cache_batches",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "batch_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_cloud_cache_manifests",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "batch_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "node_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "data_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "snapshot_generation",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0032_cloud_model_cache_snapshot_coverage.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "",
+          "name": "snapshot_position",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0032_cloud_model_cache_snapshot_coverage.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "NULLIF(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.structure.parent_occurrence_id')),'null')",
+          "name": "parent_node_key",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CAST(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.structure.child_order')) AS UNSIGNED)",
+          "name": "sibling_order",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "batch_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_workmanship_sim_cloud_cache_nodes_1",
+          "referenced_columns": [
+            "batch_id"
+          ],
+          "referenced_table": "workmanship_sim_cloud_cache_batches",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "batch_id",
+            "node_key"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "batch_id",
+            "parent_node_key",
+            "sibling_order",
+            "node_key"
+          ],
+          "name": "ix_cloud_cache_parent_order",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "batch_id",
+            "snapshot_generation",
+            "snapshot_position"
+          ],
+          "name": "uq_cloud_cache_snapshot_position",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0032_cloud_model_cache_snapshot_coverage.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_cloud_cache_nodes",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql",
+        "backend/db/migrations/domains/simulation/0032_cloud_model_cache_snapshot_coverage.sql",
+        "backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "batch_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "receipt_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "body_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "batch_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_workmanship_sim_cloud_cache_receipts_1",
+          "referenced_columns": [
+            "batch_id"
+          ],
+          "referenced_table": "workmanship_sim_cloud_cache_batches",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "batch_id",
+            "receipt_key"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_cloud_cache_receipts",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "batch_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "task_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "kind",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "payload_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "operation_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "attempt",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "batch_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_workmanship_sim_cloud_cache_tasks_1",
+          "referenced_columns": [
+            "batch_id"
+          ],
+          "referenced_table": "workmanship_sim_cloud_cache_batches",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "batch_id",
+            "task_key"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "batch_id",
+            "status"
+          ],
+          "name": "ix_cloud_cache_task",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_cloud_cache_tasks",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "project_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "phase",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": "0",
+          "extra": "",
+          "name": "next_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid",
+            "project_gid",
+            "phase"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_cloud_cache_versions",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql"
       ]
     },
     {
@@ -40352,7 +42804,7 @@
           "columns": [
             "token_hash"
           ],
-          "name": "uq_workmanship_sim_connector_enrollments_token_hash",
+          "name": "token_hash",
           "primary": false,
           "sources": [
             "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
@@ -42415,6 +44867,16 @@
           "sources": [
             "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
           ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "adapter_health_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0023_connector_app_adapter_health.sql"
+          ]
         }
       ],
       "constraints": [
@@ -42518,7 +44980,8 @@
       "sources": [
         "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql",
         "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql",
-        "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql",
+        "backend/db/migrations/domains/simulation/0023_connector_app_adapter_health.sql"
       ]
     },
     {
@@ -42742,6 +45205,149 @@
           "sources": [
             "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_file.fetch@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.batch_id')),'null') ELSE NULL END",
+          "name": "cache_file_batch",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_file.fetch@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.generation')),'null') ELSE NULL END",
+          "name": "cache_file_generation",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_file.fetch@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.snapshot_hash')),'null') ELSE NULL END",
+          "name": "cache_file_snapshot_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_file.fetch@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.node_key')),'null') ELSE NULL END",
+          "name": "cache_file_node",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_file.fetch@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.item_revision_uid')),'null') ELSE NULL END",
+          "name": "cache_file_revision",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_file.fetch@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.file_ref.dataset_uid')),'null') ELSE NULL END",
+          "name": "cache_file_dataset",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_file.fetch@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.file_ref.file_uid')),'null') ELSE NULL END",
+          "name": "cache_file_uid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_file.fetch@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.expected_content_hash')),'null') ELSE NULL END",
+          "name": "cache_file_expected_content_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_file.fetch@1' AND status='succeeded' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(outcome_json,'$.steps[0].result.content_hash')),'null') ELSE NULL END",
+          "name": "cache_file_content_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "MD5(JSON_ARRAY(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.node_key')),JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.item_revision_uid')),JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.file_ref.dataset_uid')),JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.file_ref.file_uid'))))",
+          "name": "cache_file_member_digest",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.batch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_files.size.preflight@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.identity.batch_id')),'null') ELSE NULL END",
+          "name": "cache_file_batch_plan",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.batch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_files.size.preflight@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.identity.generation')),'null') ELSE NULL END",
+          "name": "cache_file_batch_generation",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "STORED GENERATED",
+          "generation_expression": "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.batch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_files.size.preflight@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.identity.snapshot_hash')),'null') ELSE NULL END",
+          "name": "cache_file_batch_snapshot_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
+          ]
         }
       ],
       "constraints": [
@@ -42769,9 +45375,9 @@
         },
         {
           "columns": [],
-          "expression": "`status` IN ('queued','leased','executing','succeeded','failed_without_effect','outcome_unknown','manual_review_required','expired')",
+          "expression": "`reconciliation_state` IN ('not_required','pending','succeeded','failed_without_effect','manual_review_required')",
           "kind": "check",
-          "name": "check_workmanship_sim_connector_runtime_plans_3",
+          "name": "check_workmanship_sim_connector_runtime_plans_4",
           "referenced_columns": [],
           "referenced_table": null,
           "sources": [
@@ -42780,13 +45386,13 @@
         },
         {
           "columns": [],
-          "expression": "`reconciliation_state` IN ('not_required','pending','succeeded','failed_without_effect','manual_review_required')",
+          "expression": "status IN ('queued','leased','executing','succeeded','failed_without_effect','outcome_unknown','manual_review_required','expired','cancelled')",
           "kind": "check",
-          "name": "check_workmanship_sim_connector_runtime_plans_4",
+          "name": "sim_runtime_plan_status_recovery",
           "referenced_columns": [],
           "referenced_table": null,
           "sources": [
-            "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+            "backend/db/migrations/domains/simulation/0027_connector_manual_recovery_status.sql"
           ]
         }
       ],
@@ -42813,6 +45419,59 @@
           "primary": false,
           "sources": [
             "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "cache_file_batch_plan",
+            "cache_file_batch_generation",
+            "cache_file_batch_snapshot_hash",
+            "status",
+            "plan_id"
+          ],
+          "name": "ix_cache_file_batch_receipts",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "cache_file_batch",
+            "cache_file_generation",
+            "cache_file_snapshot_hash",
+            "cache_file_member_digest",
+            "status",
+            "cache_file_content_hash",
+            "plan_id"
+          ],
+          "name": "ix_cache_file_completed_member",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "cache_file_batch",
+            "cache_file_generation",
+            "cache_file_snapshot_hash",
+            "status",
+            "plan_id"
+          ],
+          "name": "ix_cache_file_completed_page",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql"
           ],
           "unique": false
         },
@@ -42845,7 +45504,10 @@
       "owner": "simulation",
       "runtime_domain": "simulation",
       "sources": [
-        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql",
+        "backend/db/migrations/domains/simulation/0027_connector_manual_recovery_status.sql",
+        "backend/db/migrations/domains/simulation/0034_cache_file_receipt_index.sql",
+        "backend/db/migrations/domains/simulation/0035_cache_file_batch_receipts.sql"
       ]
     },
     {
@@ -44655,6 +47317,216 @@
     {
       "columns": [
         {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "request_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "response_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "idempotency_key"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_live_document_adoptions",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "session_identity_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "connector_device_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "document_session",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "workspace_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'importing'",
+          "extra": "",
+          "name": "state",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "workspace_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_live_document_workspace",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspaces",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "session_identity_hash"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_live_document_bindings",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
@@ -45038,6 +47910,248 @@
     {
       "columns": [
         {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "workspace_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "document_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "insertion_instance_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "source_identity_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "endpoint_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "object_uid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "item_revision_uid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "bom_view_uid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "revision_rule",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "configuration_date",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "display_name",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "source_selector_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "inserted_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "document_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_online_source_document",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_vm_documents",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "columns": [
+            "workspace_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_online_source_workspace",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspaces",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "workspace_gid",
+            "source_identity_hash"
+          ],
+          "name": "ix_sim_online_source_lookup",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "workspace_gid",
+            "source_identity_hash",
+            "insertion_instance_id"
+          ],
+          "name": "uq_sim_online_source_identity",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_online_model_sources",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
@@ -45176,6 +48290,109 @@
       "sources": [
         "backend/db/migrations/202608100010_simulation_reproducibility.sql",
         "backend/db/migrations/domains/simulation/0001_simulation.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "document_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "dependency_signature",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "algorithm_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "source_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "payload_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "document_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_plmxml_tree_document",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_vm_documents",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "document_gid",
+            "dependency_signature",
+            "algorithm_version"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_plmxml_product_tree_cache",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0024_simulation_plmxml_product_tree_cache.sql"
       ]
     },
     {
@@ -45332,6 +48549,318 @@
       "runtime_domain": "simulation",
       "sources": [
         "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "observation_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "page_index",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "cursor_value",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "SMALLINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "node_count",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "LONGTEXT",
+          "default": null,
+          "extra": "",
+          "name": "payload_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "page_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "observation_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_product_structure_chunk_observation",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_product_structure_observations",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "observation_gid",
+            "page_index"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_product_structure_chunks",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "workspace_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "source_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(70)",
+          "default": null,
+          "extra": "",
+          "name": "observation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "captured_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "node_count",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "page_count",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "TINYINT(1)",
+          "default": null,
+          "extra": "",
+          "name": "complete",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "manifest_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "SMALLINT UNSIGNED",
+          "default": "1",
+          "extra": "",
+          "name": "schema_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "source_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_product_structure_observation_source",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_online_model_sources",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        },
+        {
+          "columns": [
+            "workspace_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_product_structure_observation_workspace",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspaces",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "source_gid",
+            "captured_at"
+          ],
+          "name": "ix_sim_product_structure_source_time",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "observation_id"
+          ],
+          "name": "uq_sim_product_structure_observation",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_product_structure_observations",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0026_teamcenter_online_structure_observations.sql"
       ]
     },
     {
@@ -46036,6 +49565,453 @@
       "runtime_domain": "simulation",
       "sources": [
         "backend/db/migrations/domains/simulation/0001_simulation.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "grant_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "authorization_operation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "proof_digest",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "proof_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "grant_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_viewer_grant_evidence",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "device_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "request_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "grant_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "interaction_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "sequence",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "event_digest",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "event_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "received_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "device_id",
+            "request_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "grant_id"
+          ],
+          "name": "idx_sim_viewer_event_grant",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_viewer_interaction_events",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "grant_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "source_association_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "session_nonce",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "grant_generation",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "issued_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "expires_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "grant_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "source_association_id",
+            "session_nonce",
+            "grant_generation"
+          ],
+          "name": "uq_sim_viewer_grant_generation",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_viewer_interaction_grants",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "source_association_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "workspace_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "document_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "device_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "runtime_instance_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "runtime_generation",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "document_session",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "source_revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "BOOLEAN",
+          "default": null,
+          "extra": "",
+          "name": "active",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "source_association_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "workspace_gid",
+            "active"
+          ],
+          "name": "idx_sim_viewer_source_workspace",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_viewer_source_associations",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
       ]
     },
     {
