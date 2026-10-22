@@ -10,6 +10,8 @@ BaselineManifest 固定引用项目阶段、BOP 结构／内容版本、流程�
 
 冻结不等于把整个 SQLite、原生内存和所有 JT 压缩一份。模型字节的长期归档单独选择，普通 FCC 缓存可淘汰。
 
+原生场景版本使用带扩展内容的PLMXML及所需派生文件；多文档可保留VF，跨机归档另选VFZ/依赖包。保存配置规则的Session可能重开成动态解析结构，TG0/TG1必须固定实际静态结构。业务manifest、原生原件和结构投影分开，不能通过现有结构codec重建后声称无损。详见[10](10-plmxml-environment-persistence.md)。
+
 ## 2. 冻结协议
 
 1. 创建 freeze request，固定 scope、业务版本、目标标签和幂等身份。

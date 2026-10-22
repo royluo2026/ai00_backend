@@ -1,5 +1,7 @@
 # 03 TC、FCC、外置原生文档与双向互动
 
+原生场景持久化补充见[10](10-plmxml-environment-persistence.md)：App重启优先精确重接活文档；丢失后才恢复保存场景。普通环境保存引用FCC/TC文件，不默认复制JT；静态冻结与动态配置恢复明确区分。
+
 ## 1. 已检查的实现与证据限度
 
 本机安装：`D:/Siemens/Teamcenter14`、`D:/Siemens/Visualization14`；用户最初提供的 `D:/Software` 未找到实际 VisMockup。安装包里包含 PSE 查看／设置版本规则、PCA 加载保存变量规则、内核 RevisionRule／SavedVariantRule／BOMWindow 及 SOA 契约。

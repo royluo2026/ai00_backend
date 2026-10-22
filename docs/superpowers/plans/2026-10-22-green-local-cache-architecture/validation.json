@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-22",
+  "status": "documentation_checks_passed",
+  "implementation_status": "not_started",
+  "checks": {
+    "subplans": 9,
+    "tasks": 25,
+    "headers": "passed",
+    "local_links_checked": 70,
+    "local_links": "passed",
+    "task_ids": "T01-T25_unique",
+    "frontend_backend_mirror": "byte_identical_after_copy",
+    "runtime_tests": "not_run",
+    "native_roundtrip": "not_run",
+    "source_research": "16_official_sections_and_existing_source_read_only"
+  },
+  "files": [
+    {
+      "file": "01-native-and-source-probes.md",
+      "bytes": 5545,
+      "sha256": "22a70f0ad64b404fa911586c8bccfd531a264a28ba06d65d314d8fdb09e456ab"
+    },
+    {
+      "file": "02-identities-and-process-revisions.md",
+      "bytes": 7653,
+      "sha256": "bac4c5627fd8d36b9ae8c777db9334b3229157391b4914792ca0b074c3ff5c92"
+    },
+    {
+      "file": "03-bindings-and-cloud-sync.md",
+      "bytes": 7838,
+      "sha256": "69177d0aa2465cc664c03854c3a061f5db12a8b39615f10e41ecf60a0b127c94"
+    },
+    {
+      "file": "04-native-collaboration-and-leases.md",
+      "bytes": 6617,
+      "sha256": "77304edc34077f2053d833b3190936ae1887be85007e5ae3ffd0b2fd38fd40fe"
+    },
+    {
+      "file": "05-flowgraph-workset-and-thumbnails.md",
+      "bytes": 6367,
+      "sha256": "5d48a74d530018810eef45d137dd9b81c3f975d4703ae62527d8058da41025e1"
+    },
+    {
+      "file": "06-storage-accounting-and-retention.md",
+      "bytes": 5849,
+      "sha256": "d54c1a6847c7f1d70dc58ff1003427a3adc1367b12113f1ce4fd4c018c9515e1"
+    },
+    {
+      "file": "07-capture-and-delivery.md",
+      "bytes": 7883,
+      "sha256": "78e3c533335acae5c3ea5b4a169ec88d4fb464e17d1172bb9a1b720c6abb5cea"
+    },
+    {
+      "file": "08-baselines-comparison-and-rollout.md",
+      "bytes": 7356,
+      "sha256": "aa8c1089f6efac1360f9fc0b573629ff5310dbd0b84f1941ce3c4d17d602d049"
+    },
+    {
+      "file": "09-plmxml-persistence-and-roundtrip.md",
+      "bytes": 8519,
+      "sha256": "30f8619927367ae83d30b1d06ae5c19f115eb571e2f41dffb78af882bb648f03"
+    },
+    {
+      "file": "README.md",
+      "bytes": 12428,
+      "sha256": "1bb12e979bc1f6600d20c8fd3e43257bcffdad4734c1778b558f6a67b3ef013e"
+    }
+  ],
+  "research": [
+    {
+      "file": "docs/architecture/green-local-cache/siemens-14.2-plmxml-research.md",
+      "bytes": 16293,
+      "sha256": "7eaf3c79c7d9d65aaa6b119fd0bd6ebfbeb608a9892d211a274882d7eb954a59"
+    }
+  ],
+  "evidence_limits": [
+    "Only documentation structure, local links, task numbering, file hashes and mirror equality are checked.",
+    "No product code changes, JT download, database migration, native save/reopen or performance measurement.",
+    "Human governance approval and runtime verification remain independent and are not granted by this report."
+  ]
+}

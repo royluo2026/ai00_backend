@@ -1,8 +1,10 @@
 # 绿标工程工作场景与本地缓存架构改造完整指南
 
-版本：1.1；日期：2026-10-22；对象：正式绿标桌面端、网页端、云端及本机 Connector。
+版本：1.2；日期：2026-10-22；对象：正式绿标桌面端、网页端、云端及本机 Connector。
 
 状态：用户已确认总体方向，本文是改造依据，不代表功能已实现、原生接口已验证或正式发布已通过。橘标只用于观察实现和性能，不是绿标业务规范。
+
+新增依据：[Siemens 14.2官方文档调查](siemens-14.2-plmxml-research.md)、[PLMXML持久化规格](../../superpowers/specs/2026-10-22-green-local-cache-architecture/10-plmxml-environment-persistence.md)、[详细实施计划](../../superpowers/plans/2026-10-22-green-local-cache-architecture/README.md)。原生场景可保存结构与扩展会话内容，但碰撞结果等仍有独立依赖；静态冻结与动态配置恢复分开，原始文件与结构投影分开。
 
 ## 1. 业务目标与边界
 

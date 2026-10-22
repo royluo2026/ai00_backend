@@ -3,7 +3,7 @@
   "status": "documentation_checks_passed",
   "spec_status": "draft_not_implemented",
   "checks": {
-    "markdown_files": 10,
+    "markdown_files": 11,
     "local_links": "passed",
     "frontend_backend_mirror": "byte_identical",
     "required_topics": [
@@ -22,11 +22,12 @@
       "recovery",
       "unknown"
     ],
-    "source_snapshot_tags": "verified_on_gitea",
+    "source_snapshot_tags": "verified_in_previous_backup_run_not_reverified_by_this_document_check",
     "new_architecture_runtime": "not_run",
     "full_regression": "not_run",
     "binding_ownership": "craft_authority_simulation_placement_digital_model_projection",
-    "auto_revision_and_multi_model": "specified_not_implemented"
+    "auto_revision_and_multi_model": "specified_not_implemented",
+    "plmxml_persistence": "official_documentation_reviewed_native_roundtrip_not_run"
   },
   "snapshot_commits": {
     "frontend": "3911ce2df87bfffed8ed4f2cd31dbe674f8d6a3d",
@@ -45,8 +46,8 @@
     },
     {
       "file": "03-teamcenter-fcc-native-collaboration.md",
-      "bytes": 6385,
-      "sha256": "0da63d6d17ccfba95f82735e8745bdce7f62ea21c45773c4da2d9d847b00d38e"
+      "bytes": 6641,
+      "sha256": "9629475506d5502f51461e7a204594ce2aa5f831d6e0996a4404e7d5551f077a"
     },
     {
       "file": "04-automation-capture-and-delivery.md",
@@ -55,18 +56,18 @@
     },
     {
       "file": "05-baselines-and-comparison.md",
-      "bytes": 5493,
-      "sha256": "0d526205f707708d1a4cd819590fe2ccfb6f1991e87e626aa3c44f5fa83b75f5"
+      "bytes": 5885,
+      "sha256": "9fcb653d0d73a6943efba30ebfe7650b09dc7820825e4a19d8aa359649c38863"
     },
     {
       "file": "06-storage-monitor-and-statusbar.md",
-      "bytes": 5646,
-      "sha256": "75f19f872e6e611083aba60a445e58f405e57ce62b8275b3185667919cb11401"
+      "bytes": 5884,
+      "sha256": "ec798e7e96663ecd94880e6de38cd8132a159e8a5260087b50bd1056b8648b6e"
     },
     {
       "file": "07-migration-acceptance-and-governance.md",
-      "bytes": 9173,
-      "sha256": "a88f3af2edb30c31f125e35d9eaa1c4782b834fc2319b6dc433f578d89bfd37b"
+      "bytes": 9522,
+      "sha256": "60949b89c6ede6b07267f7d60b3ea80df2fff725589fa36f2e633dc64154a854"
     },
     {
       "file": "08-alternate-hierarchy-binding-and-cloud-sync.md",
@@ -79,9 +80,14 @@
       "sha256": "87c5247222599e650d4f3b909a35bdfd872656df682945368989e91ba0dd85ab"
     },
     {
+      "file": "10-plmxml-environment-persistence.md",
+      "bytes": 6707,
+      "sha256": "6bad3605bdbac66ee4fc717f9bb9e34445eabb8d56a636b43513a56a774cd0f8"
+    },
+    {
       "file": "README.md",
-      "bytes": 6082,
-      "sha256": "3219ce8953ed339b8f2683640d901b42f4d8492c0708b7c32938ce3c4ba0287d"
+      "bytes": 6674,
+      "sha256": "ceaf79eb968d92112f34ca19b77f372f583fb00762445caba11b0286d8756dca"
     }
   ],
   "spec_version": "0.2",
