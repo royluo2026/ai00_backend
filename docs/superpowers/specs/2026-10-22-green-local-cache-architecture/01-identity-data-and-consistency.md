@@ -7,8 +7,9 @@
 | 所有者 | 管理事实 | 消费原则 |
 |---|---|---|
 | TC | 工程版本、配置规则、解析结构、实例及几何来源 | 经真实登录与受支持服务解析 |
-| craft | BOP、工位／工序／操作／需求、语义关系、工艺附件 | 其他域使用公开契约，不直接写 craft 表 |
-| simulation | 场景、模型集合、配置快照引用、绑定／执行及比较 | 不另造可写 BOP 主库 |
+| craft | BOP、工位／工序／操作／需求、语义关系、正式工艺绑定及附件 | 其他域使用公开契约，不直接写 craft 表 |
+| simulation | 场景、模型集合、配置快照引用、绑定草稿／适配工作场景、执行及比较 | placement 不等于正式工艺绑定，不另造可写 BOP 主库 |
+| digital_model | 模型身份、不可变模型版本／实例端点、正式关联反向查询投影 | 不独立编辑 craft 权威绑定，不用原生节点号充当端点 |
 | knowledge／规则归属域 | 标准工序、知识、规则、引用和检查定义 | 版本引用与检查结果分开 |
 | project／基线协调所有者 | 项目阶段关联与跨域基线清单，所有者待确认 | 固定各域不可变引用，不吞并域对象 |
 | 桌面 Main／Connector | 本机 SQLite、原生会话、调度、输出暂存 | Renderer 不指定任意磁盘路径或伪造 actor |
@@ -33,6 +34,10 @@
 
 `ProcessRef`：BOP 来源身份＋固定业务对象身份＋相关内容版本。流程图节点引用它，GBOP 标准定义另行引用。
 
+`ProcessRevisionRef`：固定技术修订身份与内容摘要。业务发布标签另行指向不可变修订；用户未手动升版也不能改变旧快照。已发布 A版不接受原地编辑，后续显示为“基于 A版的未发布草稿”。
+
+`BindingSchemeRef`：绑定方案身份＋方案修订，固定精确工艺快照和一个或多个明确的模型／资源目标配置。允许同一工艺快照有多份方案；同一方案可以有多条零件／资源关系，不能以 BOP ID 作为方案唯一键。
+
 工作场景版本向量建议包含 `bop_structure_revision / process_content_revision / diagram_view_revision / model_snapshot_id / binding_revision / scene_revision`。实施可映射现有粗版本，但不能只用一个 `updated_at` 同时表达全部语义。
 
 ## 3. 逻辑实体与约束
@@ -46,7 +51,10 @@
 | simulation_workspace_revision | parent、version vector、状态、差异 | CAS 提交，不覆盖 parent |
 | simulation_bop_ref | source、pinned version、working-copy identity | 插入引用与源最新版本分开 |
 | simulation_model_set | snapshot、角色、场景放置 | 集合级命名空间，放置不改来源位置 |
-| binding_revision | process requirement、model set、occurrence、证据、状态 | 端点必须存在或明确 unresolved，保留人工选择 |
+| process_technical_revision | parent、内容摘要、有效变更集、actor、事务版本 | 有效内容提交自动产生；重复请求／无变化不重复升修订 |
+| process_release_ref | 业务版本标签、固定 technical revision、发布状态 | 发布后不可原地覆盖，不以标签作身份 |
+| binding_scheme_revision | 工艺技术快照、目标配置集合、方案版本与状态 | 同一工艺可有多方案；执行显式选择 |
+| binding_revision | 方案、process requirement、typed model/resource target、角色、证据 | 正式端点完整且可验证；unresolved 仅在草稿，保留人工选择 |
 | baseline_manifest | label、parent、各域固定引用、封存摘要 | 标签不是身份，冻结不可变 |
 | result_dependency | run、工序、配置、绑定、需求和策略摘要 | 可判断适用范围，不因无关布局变更失效 |
 
@@ -55,6 +63,8 @@
 ## 4. 提交一致性
 
 AI00 单域事务内：校验 expected revision、执行变更、增加受影响 revision、记录变更序号及审计，原子提交。附件更新只更新对应关联，不覆盖整份 BOP。
+
+工艺有效保存自动产生技术修订，布局另记视图修订；发布标签、技术内容、绑定方案分别版本化。正式工艺绑定由 craft 事务同时保存关系版本与可靠发件记录，数字模型反向投影幂等消费，详情见 [08](08-alternate-hierarchy-binding-and-cloud-sync.md) 和 [09](09-process-auto-revision-and-multi-model-binding.md)。
 
 跨域协调：使用固定不可变引用和幂等准备凭据，在提交前检查依赖仍有效；不用浏览器拿到的几份 `latest` 拼出“完整基线”。不能跨域直连数据库来模拟原子提交。
 

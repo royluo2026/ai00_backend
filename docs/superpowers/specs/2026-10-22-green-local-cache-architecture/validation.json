@@ -3,7 +3,7 @@
   "status": "documentation_checks_passed",
   "spec_status": "draft_not_implemented",
   "checks": {
-    "markdown_files": 8,
+    "markdown_files": 10,
     "local_links": "passed",
     "frontend_backend_mirror": "byte_identical",
     "required_topics": [
@@ -24,7 +24,9 @@
     ],
     "source_snapshot_tags": "verified_on_gitea",
     "new_architecture_runtime": "not_run",
-    "full_regression": "not_run"
+    "full_regression": "not_run",
+    "binding_ownership": "craft_authority_simulation_placement_digital_model_projection",
+    "auto_revision_and_multi_model": "specified_not_implemented"
   },
   "snapshot_commits": {
     "frontend": "3911ce2df87bfffed8ed4f2cd31dbe674f8d6a3d",
@@ -33,13 +35,13 @@
   "files": [
     {
       "file": "01-identity-data-and-consistency.md",
-      "bytes": 6829,
-      "sha256": "ca141797114c6e18b299508ed5c8ba1949d48dd61431d8404a982330bd195516"
+      "bytes": 8494,
+      "sha256": "672df24047a3b4605849d6ac0bea853fcd3c0c4a286c298071fe06e0c064288c"
     },
     {
       "file": "02-flowgraph-workset-and-media.md",
-      "bytes": 5747,
-      "sha256": "5690382c67e5c48023f2711d1a215b0caa65b53d62f697b2269cfb5408f26e84"
+      "bytes": 6196,
+      "sha256": "507d4b713c58c015b3423e10dce8b44eed400d125743aca276b67789e9f163e6"
     },
     {
       "file": "03-teamcenter-fcc-native-collaboration.md",
@@ -48,13 +50,13 @@
     },
     {
       "file": "04-automation-capture-and-delivery.md",
-      "bytes": 6204,
-      "sha256": "7a07089527060cadccb09f2e7efff39b6cff5f3b4ce1fe99ceb85cfc81e08c32"
+      "bytes": 6638,
+      "sha256": "ff01db3bab24def04909ea9ae474c4ba240216fafe89394954380818ebbe3c64"
     },
     {
       "file": "05-baselines-and-comparison.md",
-      "bytes": 5091,
-      "sha256": "f31f38f6b185188f7071b80395cb950b0159bba67c9168d94605b5b4439b1d69"
+      "bytes": 5493,
+      "sha256": "0d526205f707708d1a4cd819590fe2ccfb6f1991e87e626aa3c44f5fa83b75f5"
     },
     {
       "file": "06-storage-monitor-and-statusbar.md",
@@ -63,13 +65,26 @@
     },
     {
       "file": "07-migration-acceptance-and-governance.md",
-      "bytes": 7829,
-      "sha256": "24ab8a1a3b021264ed7b3a2abe180365fe70fbd27d4217bd971fb3ea7585590a"
+      "bytes": 9173,
+      "sha256": "a88f3af2edb30c31f125e35d9eaa1c4782b834fc2319b6dc433f578d89bfd37b"
+    },
+    {
+      "file": "08-alternate-hierarchy-binding-and-cloud-sync.md",
+      "bytes": 8453,
+      "sha256": "4b006d7320ec989cf0e2772e3603ebd89014454c68ce2639af17507c62a78cfb"
+    },
+    {
+      "file": "09-process-auto-revision-and-multi-model-binding.md",
+      "bytes": 7138,
+      "sha256": "87c5247222599e650d4f3b909a35bdfd872656df682945368989e91ba0dd85ab"
     },
     {
       "file": "README.md",
-      "bytes": 5392,
-      "sha256": "5f9bd2cb7b4be46348246d7dbebd60cf2ee0568e9c6775ff7782a3fe7d1af796"
+      "bytes": 6082,
+      "sha256": "3219ce8953ed339b8f2683640d901b42f4d8492c0708b7c32938ce3c4ba0287d"
     }
-  ]
+  ],
+  "spec_version": "0.2",
+  "guide_version": "1.1",
+  "guide_sha256": "632ad4d53149cab9d5524fb409051725a99f69e7e9449f442862a884dcdbfda6"
 }

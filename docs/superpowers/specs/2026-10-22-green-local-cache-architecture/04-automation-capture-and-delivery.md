@@ -6,6 +6,8 @@
 
 一次开始固定 `run_id, workspace_revision, model_set, snapshot_id, bop_ref, binding_revision, capture_policy_version, expected_dependencies`。由服务器／所有者生成有序工序列表；临时顺序号仅用于本轮，不成为持久关联键。
 
+其中 bop_ref 必须包含工艺技术快照，绑定输入必须包含 binding_scheme_id 及精确 scheme_revision；仅业务标签或 binding 列表不足以开始任务。方案与当前工艺／配置不一致时拒绝执行；多适用方案未选择时要求选择，不按“最近一次绑定”推断。UI 切换方案不改已在运行的固定任务，参见 [09](09-process-auto-revision-and-multi-model-binding.md)。
+
 每步含具体 process／requirement ref、目标实例集合、相关输入摘要、可执行状态与跳过原因、可用的原生批量指令及时间预算。缺失件、未知来源、无几何不能死循环；按策略明确跳过或暂停。
 
 工序顺序来自固定工艺关系，不依赖当前 UI 折叠、卡片坐标或临时排序。倒序截图策略和标准正向工艺顺序分开记录。

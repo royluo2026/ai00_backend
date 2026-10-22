@@ -22,6 +22,8 @@ GBOP 关联保存 `standard_definition_ref + version + mapping evidence`。标�
 
 工作集键至少带服务来源、租户、主体访问范围、项目／BOP、版本和投影 schema 版本。登出或主体变化不复用旧权限结果。SQLite 写入单入口、事务更新投影和 cursor；大投影分批处理但只有完整 generation 可激活。
 
+工艺内容的正式保存按 [09 自动技术修订](09-process-auto-revision-and-multi-model-binding.md) 产生不可变修订，不依赖用户手动升业务版本。工作集同时保存明确选中的绑定方案及修订；同一工艺存在多方案时不能用最近更新方案覆盖当前选择。备选树提交和数模域投影的同步状态按 [08 绑定回传](08-alternate-hierarchy-binding-and-cloud-sync.md) 分阶段显示。
+
 本地草稿允许落盘，云端才确认正式版本。离线编辑范围第一阶段仅限可明确记录的工艺内容／布局草稿；跨域冻结、正式回填和无法验证引用的结构发布要求在线。上传草稿做 expected revision 检查，不设无限自动重试。
 
 ## 4. 同步协议
